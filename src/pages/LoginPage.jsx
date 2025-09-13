@@ -1,15 +1,19 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { SignInPage } from "@toolpad/core/SignInPage";
 import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/auth.context";  
+
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function LoginPage() {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { authenticateUser }=useContext(AuthContext)
+
 
   const providers = [{ id: "credentials", name: "Email and Password" }];
   const signIn = async (provider, formData) => {
@@ -23,6 +27,7 @@ function LoginPage() {
 
       console.log("Login success:", response);
       localStorage.setItem("authToken", response.data.authToken)
+      authenticateUser()
       navigate("/orders");
       return;
     } catch (error) {
