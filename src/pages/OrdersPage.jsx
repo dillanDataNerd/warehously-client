@@ -1,6 +1,10 @@
+import Navbar from "../components/navbar"
 function OrdersPage() {
   return (
-    <div>OrdersPage</div>
+    <>
+    <div>OrdersPageTest</div>
+    <Navbar />
+    </>
   )
 }
 export default OrdersPage
