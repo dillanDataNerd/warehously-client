@@ -1,14 +1,23 @@
+import { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../components/navbar";
+import {
+  Box,
+  Stack,
+  TextField,
+  Button,
+  CircularProgress,
+  Typography,
+  Toolbar
+} from "@mui/material";
+import PageHeader from "../components/PageHeader";
 import OrderTable from "../components/OrderTable";
-import { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../context/auth.context";
-import { Button } from "@mui/material";
 
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function OrdersPage() {
-  const { isLoggedIn } = useContext(AuthContext); // grab what you actually expose
+  const { isLoggedIn } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
 
   const getOrders = async () => {
@@ -20,7 +29,7 @@ function OrdersPage() {
       console.log(res);
       setOrders(res.data);
     } catch (err) {
-      console.error(err);
+      console.log(err);
     }
   };
 
@@ -28,12 +37,26 @@ function OrdersPage() {
     getOrders();
   },[]);
 
-  return (
-    <>
-      <Navbar />
-      {/* Pass orders to your table if it expects rows/props */}
+return (
+ <Box sx={{ p: 2, pt:0  }}>
+  <Toolbar/>
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{ mb: 2 }}
+      >
+        <TextField
+          size="small"
+          label="Search (ID, customer, status)"
+          fullWidth
+        />
+        <Button variant="outlined" onClick={getOrders}>Refresh</Button>
+        <Button variant="contained">New</Button>
+      </Stack>
+
       <OrderTable rows={orders} />
-    </>
+    </Box>
   );
 }
 

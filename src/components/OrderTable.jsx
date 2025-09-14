@@ -1,11 +1,12 @@
-    import * as React from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import * as React from "react";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import { NavLink } from "react-router-dom";
 
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -15,11 +16,19 @@ function formatDate(dateString) {
   return `${day}/${month}/${year}`;
 }
 
-function OrderTable({rows}) {
+function OrderTable({ rows }) {
   return (
     <TableContainer component={Paper}>
-      <Table  aria-label="simple table">
-        <TableHead sx={{ "& th": { fontWeight: "bold", color: "white", backgroundColor:"blue" } }} >
+      <Table aria-label="simple table">
+        <TableHead
+          sx={(theme) => ({
+            "& th": {
+              fontWeight: "bold",
+              color: theme.palette.common.white,
+              backgroundColor: theme.palette.primary.main, 
+            },
+          })}
+        >
           <TableRow>
             <TableCell>Order Id</TableCell>
             <TableCell align="right">Date</TableCell>
@@ -30,10 +39,8 @@ function OrderTable({rows}) {
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <TableRow
-              key={row.id}
-            >
-              <TableCell component="th" scope="row">
+            <TableRow key={row._id}>
+              <TableCell component={NavLink} to={`/orders/${row._id}`} scope="row">
                 {row._id}
               </TableCell>
               <TableCell align="right">{formatDate(row.createdAt)}</TableCell>
@@ -45,6 +52,6 @@ function OrderTable({rows}) {
         </TableBody>
       </Table>
     </TableContainer>
-  )
+  );
 }
-export default OrderTable
+export default OrderTable;

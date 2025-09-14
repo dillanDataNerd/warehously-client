@@ -2,25 +2,29 @@ import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
-import OrdersPage from "./pages/OrdersPage"
+import OrdersPage from "./pages/OrdersPage";
 import InventoryPage from "./pages/InventoryPage";
 import PickingRunPage from "./pages/PickingRunPage";
 import ErrorPage from "./pages/ErrorPage";
 import IsPrivate from "./components/IsPrivate";
+import AppLayout from "./components/AppLayout"; 
 
 function App() {
   return (
-    <>
-      <Routes>
-        <Route path={"/home"} element={<LoginPage />}></Route>
-        <Route path={"/signup"} element={<SignUpPage />}></Route>
-        <Route path={"/orders"} element={<IsPrivate><OrdersPage /></IsPrivate>}></Route>
-        <Route path={"/inventory"} element={<IsPrivate><InventoryPage /></IsPrivate>}></Route>
-        <Route path={"/picking-run"} element={<IsPrivate><PickingRunPage /></IsPrivate>}></Route>
-        <Route path={"/*"} element={<ErrorPage />}></Route>
+    <Routes>
+      {/* Public routes */}
+      <Route path="/home" element={<LoginPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
 
-      </Routes>
-    </>
+      {/* Protected routes*/}
+      <Route element={<IsPrivate><AppLayout /></IsPrivate>}>
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/inventory" element={<InventoryPage />} />
+        <Route path="/picking-run" element={<PickingRunPage />} />
+      </Route>
+
+      <Route path="/*" element={<ErrorPage />} />
+    </Routes>
   );
 }
 
