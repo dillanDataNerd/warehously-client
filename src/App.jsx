@@ -8,6 +8,7 @@ import PickingRunPage from "./pages/PickingRunPage";
 import ErrorPage from "./pages/ErrorPage";
 import IsPrivate from "./components/IsPrivate";
 import AppLayout from "./components/AppLayout"; 
+import NewOrdersPage from "./pages/NewOrdersPage";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/picking-run" element={<PickingRunPage />} />
+        <Route path="/orders/new" element={<NewOrdersPage />} />
       </Route>
 
       <Route path="/*" element={<ErrorPage />} />
