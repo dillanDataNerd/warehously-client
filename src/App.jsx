@@ -10,6 +10,7 @@ import IsPrivate from "./components/IsPrivate";
 import AppLayout from "./components/AppLayout"; 
 import NewOrdersPage from "./pages/NewOrdersPage";
 import OrdersEditPage from "./pages/OrdersEditPage";
+import OrderDetailPage from "./pages/OrderDetailPage";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/picking-runs" element={<PickingRunPage />} />
         <Route path="/orders/new" element={<NewOrdersPage />} />
         <Route path="/orders/edit/:orderId" element={<OrdersEditPage />} />
+        <Route path="/orders/:orderId" element={<OrderDetailPage/>}/>
       </Route>
 
       <Route path="/*" element={<ErrorPage />} />

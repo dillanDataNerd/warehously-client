@@ -1,0 +1,140 @@
+import { Stack, Box, TextField, IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import CloseIcon from '@mui/icons-material/Close';
+import SendIcon from '@mui/icons-material/Send';
+
+import { useState, useEffect } from "react";
+import axios from "axios";
+const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
+function OrderLine({ resId, resSku, resTitle, resPriceEach, resQuantity,resInventoryId }) {
+  const [viewOnly, setViewOnly] = useState(true);
+  const [priceEach, setPriceEach] = useState(0);
+  const [quantity, setQuantity] = useState(0);
+  const [inventory, setInventory] = useState("");
+
+  useEffect(() => {
+    setPriceEach(resPriceEach);
+    setQuantity(resQuantity);
+  }, [resPriceEach, resQuantity]);
+
+  useEffect(() => {
+    setInventory(`${resSku} — ${resTitle}`);
+  }, [resSku, resTitle]);
+
+  const handleDelete = async () => {
+    const authToken = localStorage.getItem("authToken");
+    try {
+      const res = await axios.delete(`${VITE_SERVER_URL}/api/orderLines/${resId}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleCancel = async () => {
+    const authToken = localStorage.getItem("authToken");
+    try {
+      const res = await axios.get(`${VITE_SERVER_URL}/api/orderLines/${resId}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setInventory(`${res.data.inventory.sku} — ${res.data.inventory.title}`);
+      setPriceEach(res.data.priceEach);
+      setQuantity(res.data.quantity);
+      setViewOnly(true);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleSave = async () => {
+    const authToken = localStorage.getItem("authToken");
+    const body = { priceEach, quantity, inventory: resInventoryId };
+    try {
+      const res = await axios.patch(`${VITE_SERVER_URL}/api/orderLines/${resId}`, body, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      console.log(res);
+      setViewOnly(true);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  return (
+    <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+      <Box sx={{ flex: "1 1 32%" }}>
+        <TextField
+          size="small"
+          label="Inventory"
+          value={inventory}
+          multiline
+          minRows={2}
+          InputProps={{ readOnly: true }}   
+          fullWidth
+        />
+      </Box>
+
+      <Box sx={{ flex: "0 1 16%" }}>
+        <TextField
+          size="small"
+          label="Quantity"
+          type="number"
+          value={quantity}
+          onChange={(e) =>
+            setQuantity(e.target.value === "" ? "" : Number(e.target.value))
+          }
+          InputProps={{ readOnly: viewOnly }}  
+          inputProps={{ min: 0, step: 1, inputMode: "numeric" }}
+          fullWidth
+        />
+      </Box>
+
+      <Box sx={{ flex: "0 1 16%" }}>
+        <TextField
+          size="small"
+          label="Price"
+          type="number"
+          value={priceEach}
+          onChange={(e) =>
+            setPriceEach(e.target.value)
+          }
+          InputProps={{ readOnly: viewOnly }}   
+          inputProps={{ min: 0, inputMode: "decimal" }}
+          fullWidth
+        />
+      </Box>
+
+      {viewOnly ? (
+        <>
+          <IconButton aria-label="edit" onClick={() => setViewOnly(false)} type="button">
+            <EditIcon />
+          </IconButton>
+          <IconButton aria-label="delete" onClick={handleDelete} type="button">
+            <DeleteIcon />
+          </IconButton>
+        </>
+      ) : (
+        <>
+          <IconButton aria-label="cancel" onClick={handleCancel} type="button">
+            <CloseIcon />
+          </IconButton>
+          <IconButton aria-label="save" onClick={handleSave} type="button">
+            <SendIcon />
+          </IconButton>
+        </>
+      )}
+    </Stack>
+  );
+}
+
+export default OrderLine;
+
+  /*add edit and delete icons at the end of the row
+        When edit button is pressed make the fields editable
+        change the button to a cancel and save
+         */
+

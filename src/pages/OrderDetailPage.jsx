@@ -17,15 +17,16 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
-import CloseIcon from "@mui/icons-material/Close";
-import SendIcon from "@mui/icons-material/Send";
+import EditIcon from "@mui/icons-material/Edit";
+import OrderLine from "../components/OrderLine";
 
-function OrdersEditPage() {
+function OrderDetailPage() {
   const [customerName, setCustomerName] = useState("");
   const [deliveryDate, setDeliveryDate] = useState(
     new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
   );
   const [status, setStatus] = useState("draft");
+  const [orderLines, setOrderLines] = useState([]);
   const navigate = useNavigate();
   const { orderId } = useParams();
 
@@ -48,7 +49,6 @@ function OrdersEditPage() {
         }
       );
       navigate(`/orders/${res.data._id}`);
-      
     } catch (err) {
       console.log(err);
     }
@@ -57,15 +57,25 @@ function OrdersEditPage() {
   const getData = async () => {
     const authToken = localStorage.getItem("authToken");
     try {
-      const response = await axios.get(
+      const orderResponse = await axios.get(
         `${VITE_SERVER_URL}/api/orders/${orderId}`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
       );
-      setCustomerName(response.data.customerName);
-      setDeliveryDate(new Date(response.data.deliveryDate));
-      setStatus(response.data.status);
+      setCustomerName(orderResponse.data.customerName);
+      setDeliveryDate(new Date(orderResponse.data.deliveryDate));
+      setStatus(orderResponse.data.status);
+
+      const orderLineResponse = await axios.get(
+        `${VITE_SERVER_URL}/api/orderLines/order/${orderId}`,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+      console.log(orderLineResponse);
+      setOrderLines(orderLineResponse.data);
+      console.log(orderLines);
     } catch (error) {
       console.log(error);
     }
@@ -77,7 +87,7 @@ function OrdersEditPage() {
   }, []);
 
   return (
-    <Box sx={{ p: 2, pt: 0, maxWidth: 640 }}>
+    <Box sx={{ p: 2, pt: 0, pb: 2, maxWidth: 640 }}>
       <Toolbar />
       <Typography variant="h4" sx={{ mb: 2 }}>
         Order: {orderId} {}
@@ -92,8 +102,10 @@ function OrdersEditPage() {
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               fullWidth
-              size="medium"
+              size="small"
               required
+              disabled
+              sx={{ width: "50%" }}
             />
 
             <DatePicker
@@ -101,16 +113,24 @@ function OrdersEditPage() {
               value={deliveryDate}
               onChange={(newValue) => setDeliveryDate(newValue)}
               format="dd/MM/yyyy"
+              disabled
               slotProps={{
                 textField: {
                   fullWidth: true,
-                  size: "medium",
+                  size: "small",
                   required: true,
+                  sx: { width: "50%" },
                 },
               }}
             />
 
-            <FormControl fullWidth size="medium" required>
+            <FormControl
+              fullWidth
+              size="small"
+              required
+              disabled
+              sx={{ width: "50%" }}
+            >
               <InputLabel id="order-status-label">Order Status</InputLabel>
               <Select
                 labelId="order-status-label"
@@ -128,27 +148,34 @@ function OrdersEditPage() {
 
             <Stack
               direction="row"
-              justifyContent="flex-end"
+              justifyContent="flex-start"
               spacing={1}
               sx={{ mt: 1 }}
             >
               <Button
-                variant="outlined"
-                startIcon={<CloseIcon />}
-                onClick={() => navigate(`/orders/${orderId}`)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
+                type="Edit"
                 variant="contained"
-                endIcon={<SendIcon />}
-                onSubmit={handleSave}
+                startIcon={<EditIcon />}
+                onClick={() => {
+                  navigate(`/orders/edit/${orderId}`);
+                }}
               >
-                Save
+                Edit
               </Button>
-              <Button onClick={getData}>Refresh</Button>
             </Stack>
+            {orderLines.map((line) => {
+              return (
+                <OrderLine
+                  key={line._id}
+                  resId={line._id}
+                  resInventoryId={line.inventory._id}
+                  resSku={line.inventory.sku}
+                  resTitle={line.inventory.title}
+                  resPriceEach={line.priceEach}
+                  resQuantity={line.quantity}
+                />
+              );
+            })}
           </Stack>
         </Box>
       </LocalizationProvider>
@@ -156,4 +183,8 @@ function OrdersEditPage() {
   );
 }
 
-export default OrdersEditPage;
+export default OrderDetailPage;
+
+// make an order line new button at the bottom of oage
+// make button create a new order line component
+// on save of new componenet rerender page?
