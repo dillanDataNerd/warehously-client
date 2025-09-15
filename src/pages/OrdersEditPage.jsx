@@ -14,10 +14,11 @@ import { useEffect, useState, useContext } from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
-import { AuthContext } from "../context/auth.context";
+import CloseIcon from "@mui/icons-material/Close";
+import SendIcon from "@mui/icons-material/Send";
 
 function OrdersEditPage() {
   const [customerName, setCustomerName] = useState("");
@@ -26,37 +27,64 @@ function OrdersEditPage() {
   );
   const [status, setStatus] = useState("draft");
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { orderId } = useParams();
 
-  const handleSubmit = async (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     const authToken = localStorage.getItem("authToken");
+
     const body = {
       customerName,
       deliveryDate,
       status,
-      createdBy: user._id,
     };
 
     try {
-      const res = await axios.post(`${VITE_SERVER_URL}/api/orders/new`, body, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      navigate(`/orders/edit/${res.data._id}`)
+      const res = await axios.patch(
+        `${VITE_SERVER_URL}/api/orders/${orderId}`,
+        body,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+      navigate(`/orders/${res.data._id}`);
+      
     } catch (err) {
       console.log(err);
     }
   };
 
+  const getData = async () => {
+    const authToken = localStorage.getItem("authToken");
+    try {
+      const response = await axios.get(
+        `${VITE_SERVER_URL}/api/orders/${orderId}`,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+      setCustomerName(response.data.customerName);
+      setDeliveryDate(new Date(response.data.deliveryDate));
+      setStatus(response.data.status);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    console.log(orderId);
+    getData();
+  }, []);
+
   return (
     <Box sx={{ p: 2, pt: 0, maxWidth: 640 }}>
       <Toolbar />
       <Typography variant="h4" sx={{ mb: 2 }}>
-        New Order
+        Order: {orderId} {}
       </Typography>
 
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <Box component="form" onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={handleSave}>
           <Stack spacing={2}>
             <TextField
               id="customer-name"
@@ -105,9 +133,22 @@ function OrdersEditPage() {
               spacing={1}
               sx={{ mt: 1 }}
             >
-              <Button type="submit" variant="contained">
-                Create Order
+              <Button
+                variant="outlined"
+                startIcon={<CloseIcon />}
+                onClick={() => navigate(`/orders/${orderId}`)}
+              >
+                Cancel
               </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                endIcon={<SendIcon />}
+                onSubmit={handleSave}
+              >
+                Save
+              </Button>
+              <Button onClick={getData}>Refresh</Button>
             </Stack>
           </Stack>
         </Box>

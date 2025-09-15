@@ -9,6 +9,7 @@ import ErrorPage from "./pages/ErrorPage";
 import IsPrivate from "./components/IsPrivate";
 import AppLayout from "./components/AppLayout"; 
 import NewOrdersPage from "./pages/NewOrdersPage";
+import OrdersEditPage from "./pages/OrdersEditPage";
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/picking-runs" element={<PickingRunPage />} />
         <Route path="/orders/new" element={<NewOrdersPage />} />
-        <Route path="/orders/edit/:orderId" element={<NewOrdersPage />} />
+        <Route path="/orders/edit/:orderId" element={<OrdersEditPage />} />
       </Route>
 
       <Route path="/*" element={<ErrorPage />} />

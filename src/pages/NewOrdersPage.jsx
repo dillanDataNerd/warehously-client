@@ -35,7 +35,6 @@ function NewOrdersPage() {
       customerName,
       deliveryDate,
       status,
-      createdBy: user._id,
     };
     console.log(body)
 
