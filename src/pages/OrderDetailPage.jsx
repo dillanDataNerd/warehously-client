@@ -9,6 +9,7 @@ import {
   Stack,
   FormControl,
   Button,
+  IconButton
 } from "@mui/material";
 import { useEffect, useState, useContext } from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -19,6 +20,8 @@ import axios from "axios";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 import EditIcon from "@mui/icons-material/Edit";
 import OrderLine from "../components/OrderLine";
+import AddIcon from "@mui/icons-material/Add";
+import NewOrderLine from "../components/NewOrderLine";
 
 function OrderDetailPage() {
   const [customerName, setCustomerName] = useState("");
@@ -73,13 +76,13 @@ function OrderDetailPage() {
           headers: { Authorization: `Bearer ${authToken}` },
         }
       );
-      console.log(orderLineResponse);
       setOrderLines(orderLineResponse.data);
-      console.log(orderLines);
     } catch (error) {
       console.log(error);
     }
   };
+
+  const addOrderLine = ()=>{console.log("hello")}
 
   useEffect(() => {
     console.log(orderId);
@@ -177,6 +180,10 @@ function OrderDetailPage() {
               );
             })}
           </Stack>
+          <IconButton aria-label="save" onClick={addOrderLine} type="button">
+            <AddIcon />
+          </IconButton>
+          <NewOrderLine/>
         </Box>
       </LocalizationProvider>
     </Box>

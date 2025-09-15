@@ -15,13 +15,11 @@ function OrderLine({ resId, resSku, resTitle, resPriceEach, resQuantity,resInven
   const [inventory, setInventory] = useState("");
 
   useEffect(() => {
+    setInventory(`${resSku} — ${resTitle}`)
     setPriceEach(resPriceEach);
     setQuantity(resQuantity);
   }, [resPriceEach, resQuantity]);
 
-  useEffect(() => {
-    setInventory(`${resSku} — ${resTitle}`);
-  }, [resSku, resTitle]);
 
   const handleDelete = async () => {
     const authToken = localStorage.getItem("authToken");
