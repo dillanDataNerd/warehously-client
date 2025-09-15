@@ -19,7 +19,7 @@ import axios from "axios";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 import { AuthContext } from "../context/auth.context";
 
-function NewOrdersPage() {
+function OrdersEditPage() {
   const [customerName, setCustomerName] = useState("");
   const [deliveryDate, setDeliveryDate] = useState(
     new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
@@ -37,14 +37,12 @@ function NewOrdersPage() {
       status,
       createdBy: user._id,
     };
-    console.log(body)
 
     try {
       const res = await axios.post(`${VITE_SERVER_URL}/api/orders/new`, body, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      console.log(res);
-      navigate(`/orders/edit/${res.data.response._id}`)
+      navigate(`/orders/edit/${res.data._id}`)
     } catch (err) {
       console.log(err);
     }
@@ -118,4 +116,4 @@ function NewOrdersPage() {
   );
 }
 
-export default NewOrdersPage;
+export default OrdersEditPage;

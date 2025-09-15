@@ -12,6 +12,7 @@ import NewOrdersPage from "./pages/NewOrdersPage";
 
 function App() {
   return (
+    <>
     <Routes>
       {/* Public routes */}
       <Route path="/home" element={<LoginPage />} />
@@ -21,12 +22,14 @@ function App() {
       <Route element={<IsPrivate><AppLayout /></IsPrivate>}>
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/inventory" element={<InventoryPage />} />
-        <Route path="/picking-run" element={<PickingRunPage />} />
+        <Route path="/picking-runs" element={<PickingRunPage />} />
         <Route path="/orders/new" element={<NewOrdersPage />} />
+        <Route path="/orders/edit/:orderId" element={<NewOrdersPage />} />
       </Route>
 
       <Route path="/*" element={<ErrorPage />} />
     </Routes>
+    </>
   );
 }
 
