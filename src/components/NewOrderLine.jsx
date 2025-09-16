@@ -1,60 +1,86 @@
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import { Stack,Box } from "@mui/material";
-import { useEffect } from "react";
+import { Stack, Box, IconButton } from "@mui/material";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import CloseIcon from "@mui/icons-material/Close";
+import SendIcon from "@mui/icons-material/Send";
+import { useParams } from "react-router-dom";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
-import { useState } from "react";
 
-function NewOrderLine() {
-  const [priceEach, setPriceEach] = useState(0);
-  const [quantity, setQuantity] = useState(0);
-  const [inventory, setInventory] = useState("");
-  const [inventoryOptions,setInventoryOptions]=useState([])
+function NewOrderLine({ getData, setDraftLine }) {
+  const [priceEach, setPriceEach] = useState(null);
+  const [quantity, setQuantity] = useState(null);
+  const [inventory, setInventory] = useState(null); 
+  const [inventoryOptions, setInventoryOptions] = useState([]);
+  const { orderId } = useParams();
 
-  const getInventoryOptions = async () => {
+
+  useEffect(() => {
+    const getInventoryOptions = async () => {
+      const authToken = localStorage.getItem("authToken");
+      try {
+        const { data } = await axios.get(`${VITE_SERVER_URL}/api/inventory`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setInventoryOptions(
+          data.map((item) => ({
+            id: item._id,
+            label: `${item.sku} - ${item.title}`,
+          }))
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getInventoryOptions();
+  }, []);
+
+  const handleCancel = () => setDraftLine(false);
+
+  const handleSave = async () => {
     const authToken = localStorage.getItem("authToken");
-    let optionsList=[]
-
+    const body = {
+      priceEach: Number(priceEach), 
+      quantity: Number(quantity),
+      inventory: inventory.id, 
+      order: orderId
+    };
     try {
-      const response = await axios.get(
-  `${VITE_SERVER_URL}/api/inventory`,
-  {
-    headers: { Authorization: `Bearer ${authToken}` },
-  }
-)
-        response.data.map((item)=>
-            optionsList.push({"id":item._id,"label":`${item.sku} - ${item.title}`}))
-        setInventoryOptions(optionsList)
-        console.log(optionsList)
-    } catch (error) {
-      console.log(error);
+      const res = await axios.post(`${VITE_SERVER_URL}/api/orderLines/new`, body, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      console.log(res);
+      setDraftLine(false);
+      getData()
+    } catch (err) {
+      console.log(err);
     }
   };
-
-  useEffect(() => {
-    getInventoryOptions()
-  });
-
-  useEffect(() => {
-    setPriceEach(priceEach);
-    setQuantity(quantity);
-    setInventory(inventory);
-  }, [priceEach, quantity]);
-
-  useEffect(() => {
-    setInventory(inventory)},[])
 
   return (
     <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
       <Box sx={{ flex: "1 1 32%" }}>
         <Autocomplete
-          disablePortal
-          label="Inventory"
           value={inventory}
+          onChange={(e, newValue) => setInventory(newValue)}
           options={inventoryOptions}
-          sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Inventory" />}
+          getOptionLabel={(o) => o?.label ?? ""}
+          isOptionEqualToValue={(a, b) => a.id === b.id}
+          renderInput={(params) => (
+            <TextField {...params} label="Inventory" size="small" />
+          )}
+          sx={{ width: 300 }} 
+          slotProps={{
+            paper: {
+              sx: {
+                "& .MuiAutocomplete-option": {
+                  textAlign: "left",
+                  justifyContent: "flex-start", 
+                },
+              },
+            },
+          }}
         />
       </Box>
 
@@ -64,9 +90,7 @@ function NewOrderLine() {
           label="Quantity"
           type="number"
           value={quantity}
-          onChange={(e) =>
-            setQuantity(e.target.value === "" ? "" : Number(e.target.value))
-          }
+          onChange={(e) => setQuantity(Number(e.target.value))}
           inputProps={{ min: 0, step: 1, inputMode: "numeric" }}
           fullWidth
         />
@@ -78,12 +102,20 @@ function NewOrderLine() {
           label="Price"
           type="number"
           value={priceEach}
-          onChange={(e) => setPriceEach(e.target.value)}
+          onChange={(e) => setPriceEach(Number(e.target.value))}
           inputProps={{ min: 0, inputMode: "decimal" }}
           fullWidth
         />
       </Box>
+
+      <IconButton aria-label="cancel" onClick={handleCancel} type="button">
+        <CloseIcon />
+      </IconButton>
+      <IconButton aria-label="save" onClick={handleSave} type="button">
+        <SendIcon />
+      </IconButton>
     </Stack>
   );
 }
+
 export default NewOrderLine;

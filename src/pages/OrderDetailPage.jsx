@@ -9,7 +9,7 @@ import {
   Stack,
   FormControl,
   Button,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import { useEffect, useState, useContext } from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -22,6 +22,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import OrderLine from "../components/OrderLine";
 import AddIcon from "@mui/icons-material/Add";
 import NewOrderLine from "../components/NewOrderLine";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function OrderDetailPage() {
   const [customerName, setCustomerName] = useState("");
@@ -32,6 +33,23 @@ function OrderDetailPage() {
   const [orderLines, setOrderLines] = useState([]);
   const navigate = useNavigate();
   const { orderId } = useParams();
+  const [draftLine, setDraftLine] = useState(false);
+
+  const handleDelete = async () => {
+    const authToken = localStorage.getItem("authToken");
+    try {
+      const res = await axios.delete(
+        `${VITE_SERVER_URL}/api/orders/${orderId}`,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+      console.log(res);
+      navigate(`/orders`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -76,18 +94,16 @@ function OrderDetailPage() {
           headers: { Authorization: `Bearer ${authToken}` },
         }
       );
+      
       setOrderLines(orderLineResponse.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const addOrderLine = ()=>{console.log("hello")}
-
   useEffect(() => {
-    console.log(orderId);
     getData();
-  }, []);
+  }, [draftLine]);
 
   return (
     <Box sx={{ p: 2, pt: 0, pb: 2, maxWidth: 640 }}>
@@ -165,6 +181,15 @@ function OrderDetailPage() {
               >
                 Edit
               </Button>
+              <Button
+                type="delete"
+                variant="contained"
+                startIcon={<DeleteIcon />}
+                color="error"
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
             </Stack>
             {orderLines.map((line) => {
               return (
@@ -180,10 +205,19 @@ function OrderDetailPage() {
               );
             })}
           </Stack>
-          <IconButton aria-label="save" onClick={addOrderLine} type="button">
+          {draftLine && (
+            <NewOrderLine orderLines={orderLines} setOrderLines={setOrderLines} setDraftLine={setDraftLine} />
+          )}
+          <IconButton
+            aria-label="addOrderLine"
+            disabled={draftLine}
+            onClick={() => {
+              setDraftLine(true);
+            }}
+            type="button"
+          >
             <AddIcon />
           </IconButton>
-          <NewOrderLine/>
         </Box>
       </LocalizationProvider>
     </Box>
