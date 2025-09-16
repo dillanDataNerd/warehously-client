@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Typography, Stack, Button } from "@mui/material";
+import { Box, Typography, Stack, Button,Toolbar } from "@mui/material";
 import ImageNotSupportedIcon from "@mui/icons-material/ImageNotSupported";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -19,11 +19,14 @@ function InventoryDetailsPage() {
     const getData = async () => {
       const authToken = localStorage.getItem("authToken");
       try {
-        const res = await axios.get(`${VITE_SERVER_URL}/api/inventory/${inventoryId}`, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
+        const res = await axios.get(
+          `${VITE_SERVER_URL}/api/inventory/${inventoryId}`,
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
+        );
         setInv(res.data);
-        setImgError(false); // reset for each item
+        setImgError(false)
       } catch (e) {
         console.error(e);
         setError("Failed to load inventory.");
@@ -45,7 +48,9 @@ function InventoryDetailsPage() {
   };
 
   const fmtMoney = (n) =>
-    typeof n === "number" ? n.toLocaleString(undefined, { style: "currency", currency: "EUR" }) : "—";
+    typeof n === "number"
+      ? n.toLocaleString(undefined, { style: "currency", currency: "EUR" })
+      : "—";
   const fmtNumber = (n) => (typeof n === "number" ? n.toLocaleString() : "—");
   const fmtDate = (d) => (d ? new Date(d).toLocaleString() : "—");
   const val = (v) => v ?? "—";
@@ -55,11 +60,12 @@ function InventoryDetailsPage() {
 
   return (
     <Box sx={{ maxWidth: 720, mx: "auto", p: 2, textAlign: "left" }}>
+      <Toolbar />
+
       <Typography variant="h5" sx={{ mb: 2 }}>
         Inventory Details
       </Typography>
 
-      {/* Image with error + empty URL handling */}
       {inv.imageUrl && !imgError ? (
         <Box
           component="img"
@@ -98,18 +104,31 @@ function InventoryDetailsPage() {
           "& dt": { color: "text.secondary" },
         }}
       >
-        <Box component="dt">SKU</Box>                <Box component="dd">{val(inv.sku)}</Box>
-        <Box component="dt">Title</Box>              <Box component="dd">{val(inv.title)}</Box>
-        <Box component="dt">Description</Box>        <Box component="dd">{val(inv.description)}</Box>
-        <Box component="dt">Cost</Box>               <Box component="dd">{fmtMoney(inv.cost)}</Box>
-        <Box component="dt">Recommended Price</Box>  <Box component="dd">{fmtMoney(inv.recommendedPrice)}</Box>
-        <Box component="dt">Location</Box>           <Box component="dd">{val(inv.location)}</Box>
-        <Box component="dt">Stocked Qty</Box>        <Box component="dd">{fmtNumber(inv.stockedQty)}</Box>
-        <Box component="dt">Available Qty</Box>      <Box component="dd">{fmtNumber(inv.availableQty)}</Box>
-        <Box component="dt">Created</Box>            <Box component="dd">{fmtDate(inv.createdAt)}</Box>
+        <Box component="dt">SKU</Box> <Box component="dd">{val(inv.sku)}</Box>
+        <Box component="dt">Title</Box>{" "}
+        <Box component="dd">{val(inv.title)}</Box>
+        <Box component="dt">Description</Box>{" "}
+        <Box component="dd">{val(inv.description)}</Box>
+        <Box component="dt">Cost</Box>{" "}
+        <Box component="dd">{fmtMoney(inv.cost)}</Box>
+        <Box component="dt">Recommended Price</Box>{" "}
+        <Box component="dd">{fmtMoney(inv.recommendedPrice)}</Box>
+        <Box component="dt">Location</Box>{" "}
+        <Box component="dd">{val(inv.location)}</Box>
+        <Box component="dt">Stocked Qty</Box>{" "}
+        <Box component="dd">{fmtNumber(inv.stockedQty)}</Box>
+        <Box component="dt">Available Qty</Box>{" "}
+        <Box component="dd">{fmtNumber(inv.availableQty)}</Box>
+        <Box component="dt">Created</Box>{" "}
+        <Box component="dd">{fmtDate(inv.createdAt)}</Box>
       </Box>
 
-      <Stack direction="row" justifyContent="flex-start" spacing={1} sx={{ mt: 1 }}>
+      <Stack
+        direction="row"
+        justifyContent="flex-start"
+        spacing={1}
+        sx={{ mt: 1 }}
+      >
         <Button
           type="button"
           variant="contained"

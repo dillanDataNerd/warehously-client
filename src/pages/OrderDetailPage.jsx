@@ -18,10 +18,10 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
-import EditIcon from "@mui/icons-material/Edit";
 import OrderLine from "../components/OrderLine";
 import AddIcon from "@mui/icons-material/Add";
 import NewOrderLine from "../components/NewOrderLine";
+import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 function OrderDetailPage() {
@@ -225,7 +225,3 @@ function OrderDetailPage() {
 }
 
 export default OrderDetailPage;
-
-// make an order line new button at the bottom of oage
-// make button create a new order line component
-// on save of new componenet rerender page?
