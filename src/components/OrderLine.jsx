@@ -98,7 +98,7 @@ function OrderLine({ resId, resSku, resTitle, resPriceEach, resQuantity,resInven
           type="number"
           value={priceEach}
           onChange={(e) =>
-            setPriceEach(e.target.value)
+       git      setPriceEach(e.target.value)
           }
           InputProps={{ readOnly: viewOnly }}   
           inputProps={{ min: 0, inputMode: "decimal" }}
