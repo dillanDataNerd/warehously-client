@@ -44,7 +44,7 @@ function formatDate(dateString) {
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row._id}>
-              <TableCell to={`/orders/${row._id}`} scope="row" component={NavLink} >{row.sku}</TableCell>
+              <TableCell to={`/inventory/${row._id}`} scope="row" component={NavLink} >{row.sku}</TableCell>
               <TableCell align="right">{row.title}</TableCell>
               <TableCell align="right">{row.cost}</TableCell>
               <TableCell align="right">{row.availableQty}</TableCell>

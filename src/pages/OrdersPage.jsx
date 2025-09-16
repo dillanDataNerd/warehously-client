@@ -27,7 +27,6 @@ function OrdersPage() {
       const res = await axios.get(`${VITE_SERVER_URL}/api/orders`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-      console.log(res);
       setOrders(res.data);
     } catch (err) {
       console.log(err);

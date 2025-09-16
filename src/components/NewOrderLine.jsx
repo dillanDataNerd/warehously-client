@@ -8,7 +8,7 @@ import SendIcon from "@mui/icons-material/Send";
 import { useParams } from "react-router-dom";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-function NewOrderLine({ getData, setDraftLine }) {
+function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
   const [priceEach, setPriceEach] = useState(null);
   const [quantity, setQuantity] = useState(null);
   const [inventory, setInventory] = useState(null); 
@@ -52,7 +52,7 @@ function NewOrderLine({ getData, setDraftLine }) {
       });
       console.log(res);
       setDraftLine(false);
-      getData()
+      setOrderLines([orderLines.push(body)])
     } catch (err) {
       console.log(err);
     }
