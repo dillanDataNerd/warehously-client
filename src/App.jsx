@@ -20,6 +20,7 @@ function App() {
     <>
     <Routes>
       {/* Public routes */}
+      <Route path="/" element={<LoginPage />} />
       <Route path="/home" element={<LoginPage />} />
       <Route path="/signup" element={<SignUpPage />} />
 
