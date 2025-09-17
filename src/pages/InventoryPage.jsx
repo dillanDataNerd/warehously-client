@@ -8,6 +8,8 @@ import {
   CircularProgress,
   Typography,
   Toolbar,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import PageHeader from "../components/PageHeader";
 import InventoryTable from "../components/InventoryTable";
@@ -18,9 +20,10 @@ import { NavLink } from "react-router-dom";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function InventoryPage() {
-
   const { isLoggedIn } = useContext(AuthContext);
-  const [inventory, setInventory] = useState([]);
+  const [allInventory, setAllInventory] = useState([]);
+  const [filteredInventory,setFilteredInventory]=useState([])
+  const [searchString, setSearchString] = useState("");
 
   const getInventory = async () => {
     const storedToken = localStorage.getItem("authToken");
@@ -28,32 +31,60 @@ function InventoryPage() {
       const res = await axios.get(`${VITE_SERVER_URL}/api/inventory`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-      setInventory(res.data);
+      setAllInventory(res.data);
+      setFilteredInventory(res.data)
     } catch (err) {
       console.log(err);
     }
   };
 
+  const filterInventory = () => {
+    const query = searchString.trim().toLowerCase()
+
+    let reducedInventory = allInventory.filter((row) =>{
+      const titleCheck= row.title.toLowerCase().includes(query) 
+      const skuCheck= row.sku.toLowerCase().includes(query)
+    return titleCheck || skuCheck}
+    );
+    setFilteredInventory(reducedInventory);
+  };
+
+    useEffect(() => {
+    getInventory()
+    }, []);
+
   useEffect(() => {
-    getInventory();
-  }, []);
+    if (searchString.length==0){
+      setFilteredInventory(allInventory)
+    }
+    if (searchString) {
+      filterInventory();
+    }
+
+  }, [searchString]);
 
   return (
     <Box sx={{ p: 2, pt: 0 }}>
       <Toolbar />
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <TextField size="small" label="Search SKU, title)" fullWidth />
-        <Button variant="outlined" onClick={getInventory}>
-          Refresh
-        </Button>
+        <TextField
+          value={searchString}
+          onChange={(e) => {
+            setSearchString(e.target.value)
+          }}
+          size="small"
+          label="Search SKU, title)"
+          fullWidth
+        />
+
         <Button variant="contained" component={NavLink} to="/inventory/new">
           New
         </Button>
       </Stack>
 
-      <InventoryTable rows={inventory} />
+      <InventoryTable rows={filteredInventory} />
     </Box>
   );
 }
 
-export default InventoryPage
+export default InventoryPage;
