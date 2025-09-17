@@ -13,6 +13,7 @@ import OrdersEditPage from "./pages/OrdersEditPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import InventoryDetailsPage from "./pages/InventoryDetailsPage";
 import NewInventoryPage from "./pages/NewInventoryPage";
+import InventoryEditPage from "./pages/InventoryEditPage";
 
 function App() {
   return (
@@ -31,7 +32,7 @@ function App() {
         <Route path="/orders/edit/:orderId" element={<OrdersEditPage />} />
         <Route path="/orders/:orderId" element={<OrderDetailPage/>}/>
         <Route path="/inventory/new" element={<NewInventoryPage />} />
-        <Route path="/inventory/edit/:inventoryId" element={<OrdersEditPage />} />
+        <Route path="/inventory/edit/:inventoryId" element={<InventoryEditPage />} />
         <Route path="/inventory/:inventoryId" element={<InventoryDetailsPage />} />
       </Route>
 

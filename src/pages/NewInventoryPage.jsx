@@ -230,7 +230,7 @@ function NewInventoryPage() {
             variant="contained"
             onClick={() => handleSubmit()}
           >
-            Create Order
+            Create Inventory
           </Button>
         </Stack>
         {openToast && <Toast message={"Image successfully uploaded"} success={true} />}
