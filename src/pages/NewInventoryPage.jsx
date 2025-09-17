@@ -11,55 +11,48 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import Toast from "../components/Toast";
 
 function NewInventoryPage() {
   const navigate = useNavigate();
   const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-  const [sku, setSKU] = useState(null);
-  const [title, setTitle] = useState(null);
-  const [description, setDescription] = useState(null);
+  const [sku, setSKU] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [cost, setCost] = useState(null);
   const [recommendedPrice, setRecommendedPrice] = useState(null);
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState("");
   const [stockedQty, setStockedQuantity] = useState(null);
   const [availableQty, setAvailableQty] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [openToast, setOpenToast] = useState(false);
+  
 
-  const [isUploading, setIsUploading] = useState(false); // for a loading animation effect
-
-  // below function should be the only function invoked when the file type input changes => onChange={handleFileUpload}
+  const [isUploading, setIsUploading] = useState(false);
   const handleFileUpload = async (event) => {
-    console.log("The file to be uploaded is: ", e.target.files[0]);
+    console.log("The file to be uploaded is: ", event.target.files[0]);
 
     if (!event.target.files[0]) {
-      // to prevent accidentally clicking the choose file button and not selecting a file
       return;
     }
 
-    setIsUploading(true); // to start the loading animation
+    setIsUploading(true);
 
-    const uploadData = new FormData(); // images and other files need to be sent to the backend in a FormData
+    const uploadData = new FormData();
     uploadData.append("image", event.target.files[0]);
-        console.log("The file to be uploaded is: ", e.target.files[0]);
-                   
-    //     this name needs to match the name used in the middleware in the backend => uploader.single("image")
+    console.log("The file to be uploaded is: ", event.target.files[0]);
 
     try {
       const response = await axios.post(
         `${VITE_SERVER_URL}/api/upload`,
         uploadData
       );
-      // !IMPORTANT: Adapt the request structure to the one in your proyect (services, .env, auth, etc...)
-console.log(response)
       setImageUrl(response.data.imageUrl);
-
-      //                          |
-      //     this is how the backend sends the image to the frontend => res.json({ imageUrl: req.file.path });
-
-      setIsUploading(false); // to stop the loading animation
+      setIsUploading(false);
+      setOpenToast(true)
     } catch (error) {
-      navigate("/error");
+      console.log("There was an error uploading the file");
     }
   };
 
@@ -88,10 +81,18 @@ console.log(response)
       availableQty,
       imageUrl,
     };
-
-    const res = await axios.post(`${VITE_SERVER_URL}/api/inventory/new`, body, {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
+    try {
+      const res = await axios.post(
+        `${VITE_SERVER_URL}/api/inventory/new`,
+        body,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -124,20 +125,6 @@ console.log(response)
             size="medium"
             required
           />
-          <Button
-            component="label"
-            role={undefined}
-            variant="contained"
-            tabIndex={-1}
-            disabled={isUploading}
-            startIcon={<CloudUploadIcon />}
-          >
-            Upload files
-            <VisuallyHiddenInput
-              type="file"
-              onChange={() => handleFileUpload}
-            />
-          </Button>
           <TextField
             id="description"
             label="Description"
@@ -211,6 +198,18 @@ console.log(response)
             required
           />
         </Stack>
+        <Button
+          component="label"
+          role={undefined}
+          variant="contained"
+          tabIndex={-1}
+          disabled={isUploading}
+          startIcon={<CloudUploadIcon />}
+          fullWidth
+        >
+          Upload photo
+          <VisuallyHiddenInput type="file" onChange={handleFileUpload} />
+        </Button>
         <Stack
           direction="row"
           justifyContent="flex-end"
@@ -234,6 +233,7 @@ console.log(response)
             Create Order
           </Button>
         </Stack>
+        {openToast && <Toast message={"Image successfully uploaded"} success={true} />}
       </Box>
     </>
   );
