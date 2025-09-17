@@ -1,78 +1,31 @@
 import { useState } from "react";
 import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
-import FormControl from "@mui/material/FormControl";
-import Link from "@mui/material/Link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
-import MuiCard from "@mui/material/Card";
-import { styled } from "@mui/material/styles";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignSelf: "center",
-  width: "100%",
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: "auto",
-  [theme.breakpoints.up("sm")]: {
-    maxWidth: "450px",
-  },
-  boxShadow:
-    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
-  ...theme.applyStyles("dark", {
-    boxShadow:
-      "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
-  }),
-}));
-
-const SignUpContainer = styled(Stack)(({ theme }) => ({
-  height: "calc((1 - var(--template-frame-height, 0)) * 100dvh)",
-  minHeight: "100%",
-  padding: theme.spacing(2),
-  [theme.breakpoints.up("sm")]: {
-    padding: theme.spacing(4),
-  },
-  "&::before": {
-    content: '""',
-    display: "block",
-    position: "absolute",
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
-    backgroundRepeat: "no-repeat",
-    ...theme.applyStyles("dark", {
-      backgroundImage:
-        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
-    }),
-  },
-}));
+import Toast from "../components/Toast";
 
 export default function SignIn() {
   const [emailError, setEmailError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-    
-  const navigate=useNavigate()
 
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
-    e.preventDefault()
-    validateInputs()
+    e.preventDefault();
+    validateInputs();
 
     const data = {
       firstName,
@@ -82,24 +35,24 @@ export default function SignIn() {
     };
 
     try {
-      console.log(data)
-      const res = await axios.post(`${VITE_SERVER_URL}/api/users/signup`,data);
+      console.log(data);
+      const res = await axios.post(`${VITE_SERVER_URL}/api/users/signup`, data);
       console.log(res);
-      navigate("/home")
+      setShowToast(true);
+      navigate("/home");
     } catch (error) {
       console.log(error);
     }
   };
 
   const validateInputs = () => {
-
     let isValid = true;
 
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
       setEmailErrorMessage("Please enter a valid email address.");
       isValid = false;
-      return
+      return;
     } else {
       setEmailError(false);
       setEmailErrorMessage("");
@@ -109,24 +62,42 @@ export default function SignIn() {
       setPasswordError(true);
       setPasswordErrorMessage("Password must be at least 6 characters long.");
       isValid = false;
-      return
+      return;
     } else {
       setPasswordError(false);
       setPasswordErrorMessage("");
     }
-
   };
 
   return (
     <>
-      <SignUpContainer direction="column" justifyContent="space-between">
-        <Card variant="outlined">
+      <Box
+        direction="column"
+        justifyContent="space-between"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          maxWidth: 400,
+
+          alignItems: "center",
+          minHeight: "100vh",
+          px: 2,
+        }}
+      >
+        <Card
+          variant="outlined"
+          sx={{
+            width: "100%",
+            p: 4,
+            boxShadow: 3,
+          }}
+        >
           <Typography
             component="h1"
             variant="h4"
             sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
           >
-            Sign up
+            Sign up to warehously
           </Typography>
           <Box
             component="form"
@@ -188,7 +159,6 @@ export default function SignIn() {
               placeholder="••••••"
               type="password"
               id="password"
-              autoComplete="current-password"
               autoFocus
               required
               fullWidth
@@ -201,13 +171,21 @@ export default function SignIn() {
               type="submit"
               fullWidth
               variant="contained"
-              onClick={(e)=>{handleSubmit(e)}}
+              onClick={(e) => {
+                handleSubmit(e);
+              }}
             >
               Sign up
             </Button>
+            {showToast && (
+              <Toast
+                message={"You have successfully created a user"}
+                success={true}
+              />
+            )}
           </Box>
         </Card>
-      </SignUpContainer>
+      </Box>
     </>
   );
 }

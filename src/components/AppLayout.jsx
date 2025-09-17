@@ -18,6 +18,7 @@ import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PeopleIcon from "@mui/icons-material/People";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const drawerWidth = 180;
 
@@ -46,7 +47,7 @@ function AppLayout() {
       >
         {/* pushes content below AppBar height */}
         <Toolbar />
-        <Box sx={{ overflow: "auto", p:2}}>
+        <Box sx={{ overflow: "auto", p: 2 }}>
           <List>
             <ListItemButton component={NavLink} to="/orders">
               <ListItemIcon>
@@ -62,12 +63,12 @@ function AppLayout() {
               <ListItemText primary="Inventory" />
             </ListItemButton>
 
-            <ListItemButton component={NavLink} to="/picking-runs">
+            {/* <ListItemButton component={NavLink} to="/picking-runs">
               <ListItemIcon>
                 <LocalShippingIcon />
               </ListItemIcon>
               <ListItemText primary="Picking" />
-            </ListItemButton>
+            </ListItemButton> */}
 
             <Divider sx={{ my: 1 }} />
 
@@ -78,6 +79,22 @@ function AppLayout() {
               <ListItemText primary="Users" />
             </ListItemButton>
           </List>
+        </Box>
+
+        <Box sx={{ mt: "auto", p: 2 }}>
+          <Divider sx={{ my: 1 }} />
+          <ListItemButton
+            onClick={() => {
+              localStorage.removeItem("authToken");
+            }}
+            component={NavLink}
+            to="/home"
+          >
+            <ListItemIcon>
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText primary="Logout" />
+          </ListItemButton>
         </Box>
       </Drawer>
       <Outlet />
