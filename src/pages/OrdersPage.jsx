@@ -19,7 +19,9 @@ const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function OrdersPage() {
   const { isLoggedIn } = useContext(AuthContext);
-  const [orders, setOrders] = useState([]);
+  const [allOrders, setAllOrders] = useState([]);
+  const [filteredOrders,setFilteredOrders]=useState([])
+  const [searchString,setSearchString]=useState("")
 
   const getOrders = async () => {
     const storedToken = localStorage.getItem("authToken");
@@ -27,30 +29,53 @@ function OrdersPage() {
       const res = await axios.get(`${VITE_SERVER_URL}/api/orders`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-      setOrders(res.data);
+      setAllOrders(res.data);
+      setFilteredOrders(res.data)
+      console.log(allOrders)
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const filterOrders= () => {
+    const query = searchString.trim().toLowerCase()
+    console.log(allOrders)
+
+    let reducedOrders = allOrders.filter((row) =>{
+      const idCheck= row._id.includes(query) 
+      const customerCheck= String(row?.customerName || "").trim().toLowerCase().includes(query);
+    return idCheck || customerCheck}
+    );
+    setFilteredOrders(reducedOrders);
   };
 
   useEffect(() => {
     getOrders();
   }, []);
 
+    useEffect(() => {
+    filterOrders();
+  }, [searchString]);
+
   return (
     <Box sx={{ p: 2, pt: 0 }}>
       <Toolbar />
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <TextField size="small" label="Search (ID, customer)" fullWidth />
-        <Button variant="outlined" onClick={getOrders}>
-          Refresh
-        </Button>
+        <TextField
+          value={searchString}
+          onChange={(e) => {
+            setSearchString(e.target.value)
+          }}
+          size="small"
+          label="Search ID and customer)"
+          fullWidth
+        />     
         <Button variant="contained" component={NavLink} to="/orders/new">
           New
         </Button>
       </Stack>
 
-      <OrderTable rows={orders} />
+      <OrderTable rows={filteredOrders} />
     </Box>
   );
 }
