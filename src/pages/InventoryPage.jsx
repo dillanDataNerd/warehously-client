@@ -73,7 +73,7 @@ function InventoryPage() {
             setSearchString(e.target.value)
           }}
           size="small"
-          label="Search SKU, title)"
+          label="Search SKU and Title)"
           fullWidth
         />
 

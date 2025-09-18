@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 import { AuthContext } from "../context/auth.context";
+import CloseIcon from "@mui/icons-material/Close";
 
 function NewOrdersPage() {
   const [customerName, setCustomerName] = useState("");
@@ -36,28 +37,28 @@ function NewOrdersPage() {
       deliveryDate,
       status,
     };
-    console.log(body)
+    console.log(body);
 
     try {
       const res = await axios.post(`${VITE_SERVER_URL}/api/orders/new`, body, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       console.log(res);
-      navigate(`/orders/${res.data.response._id}`)
+      navigate(`/orders/${res.data.response._id}`);
     } catch (err) {
       console.log(err);
     }
   };
 
   return (
-    <Box sx={{ p: 2, pt: 0, maxWidth: 640 }}>
+    <Box sx={{ p: 2, pt: 0 }}>
       <Toolbar />
-      <Typography variant="h6" sx={{ mb: 2 }}>
+      <Typography variant="h6" sx={{ mb: 2, textAlign: "left" }}>
         New Order
       </Typography>
 
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <Box component="form" onSubmit={handleSubmit}>
+        <Box component="form" fullWidth onSubmit={handleSubmit}>
           <Stack spacing={2}>
             <TextField
               id="customer-name"
@@ -65,7 +66,6 @@ function NewOrdersPage() {
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               fullWidth
-              size="small"
               required
             />
 
@@ -78,7 +78,6 @@ function NewOrdersPage() {
               slotProps={{
                 textField: {
                   fullWidth: true,
-                  size: "small",
                   required: true,
                 },
               }}
@@ -106,6 +105,13 @@ function NewOrdersPage() {
               spacing={1}
               sx={{ mt: 1 }}
             >
+              <Button
+                variant="outlined"
+                startIcon={<CloseIcon />}
+                onClick={() => navigate(`/orders/${orderId}`)}
+              >
+                Cancel
+              </Button>
               <Button type="submit" variant="contained">
                 Create Order
               </Button>

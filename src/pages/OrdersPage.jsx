@@ -39,7 +39,6 @@ function OrdersPage() {
 
   const filterOrders= () => {
     const query = searchString.trim().toLowerCase()
-    console.log(allOrders)
 
     let reducedOrders = allOrders.filter((row) =>{
       const idCheck= row._id.includes(query) 

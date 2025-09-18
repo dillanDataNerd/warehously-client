@@ -153,4 +153,4 @@ function InventoryDetailsPage() {
   );
 }
 
-module.exports = validateNoOpenOrderlines;
+export default InventoryDetailsPage;

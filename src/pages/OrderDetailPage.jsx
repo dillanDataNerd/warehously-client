@@ -5,6 +5,7 @@ import {
   Button,
   IconButton,
   Toolbar,
+  Divider,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -31,7 +32,13 @@ function OrderDetailPage() {
   const { orderId } = useParams();
 
   const fmtDate = (d) =>
-    d ? new Date(d).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" }) : "—";
+    d
+      ? new Date(d).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        })
+      : "—";
 
   const handleDelete = async () => {
     const authToken = localStorage.getItem("authToken");
@@ -53,7 +60,9 @@ function OrderDetailPage() {
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
       setCustomerName(orderRes.data.customerName || "");
-      setDeliveryDate(orderRes.data.deliveryDate ? new Date(orderRes.data.deliveryDate) : null);
+      setDeliveryDate(
+        orderRes.data.deliveryDate ? new Date(orderRes.data.deliveryDate) : null
+      );
       setStatus(orderRes.data.status || "draft");
 
       const linesRes = await axios.get(
@@ -61,6 +70,7 @@ function OrderDetailPage() {
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
       setOrderLines(linesRes.data || []);
+      setDraftLine(linesRes.data.length === 0);
     } catch (error) {
       console.log(error);
     }
@@ -69,8 +79,7 @@ function OrderDetailPage() {
   // Load on mount, when orderId changes, and refresh after closing draft line
   useEffect(() => {
     getData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId, draftLine === false]); // refresh when draftLine flips back to false
+  }, [orderId ,draftLine]); // refresh when draftLine flips back to false
 
   return (
     <Box sx={{ p: 2, pt: 0, pb: 2, maxWidth: 640 }}>
@@ -88,7 +97,7 @@ function OrderDetailPage() {
           rowGap: 1,
           "& dt, & dd": { m: 0 },
           "& dt": { color: "text.secondary" },
-          textAlign: "left" 
+          textAlign: "left",
         }}
       >
         <Box component="dt">Customer</Box>
@@ -104,7 +113,7 @@ function OrderDetailPage() {
       <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
         <Button
           type="button"
-          variant="contained"
+          variant="outlined"
           startIcon={<EditIcon />}
           onClick={() => navigate(`/orders/edit/${orderId}`)}
         >
@@ -112,15 +121,19 @@ function OrderDetailPage() {
         </Button>
         <Button
           type="button"
-          variant="contained"
+          variant="outlined"
           startIcon={<DeleteIcon />}
           color="error"
           onClick={handleDelete}
         >
           Delete
         </Button>
-
       </Stack>
+
+      <Divider sx={{ my: 3 }} />
+      <Typography variant="h6" textAlign={"left"}>
+        Order Lines
+      </Typography>
 
       <Stack spacing={1} sx={{ mt: 2 }}>
         {orderLines.map((line) => (
@@ -134,7 +147,6 @@ function OrderDetailPage() {
             resQuantity={line.quantity}
           />
         ))}
-      </Stack>
 
       {draftLine && (
         <NewOrderLine
@@ -143,6 +155,9 @@ function OrderDetailPage() {
           setDraftLine={setDraftLine}
         />
       )}
+      
+      </Stack>
+
 
       <IconButton
         aria-label="addOrderLine"
