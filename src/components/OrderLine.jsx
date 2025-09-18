@@ -90,13 +90,13 @@ function OrderLine({
     >
       <Box sx={{ flex: "1 1 32%" }}>
         <TextField
-          size="small"
           label="Inventory"
           value={inventory}
           multiline
           minRows={2}
           InputProps={{ readOnly: true }}
           fullWidth
+          
         />
       </Box>
 

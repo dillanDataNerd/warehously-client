@@ -72,14 +72,14 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
       <Box sx={{ flex: "1 1 32%" }}>
         <Autocomplete
           value={inventory}
-          onChange={(e, newValue) => setInventory(newValue)}
+          onChange={(event, newValue) => setInventory(newValue)}
           options={inventoryOptions}
           getOptionLabel={(o) => o?.label ?? ""}
           isOptionEqualToValue={(a, b) => a.id === b.id}
           renderInput={(params) => (
             <TextField {...params} label="Inventory" size="small" />
           )}
-          sx={{ width: 300 }}
+          fullWidth
           slotProps={{
             paper: {
               sx: {
