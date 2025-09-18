@@ -1,28 +1,22 @@
 import {
   Typography,
   Box,
-  TextField,
-  Toolbar,
-  InputLabel,
-  Select,
-  MenuItem,
   Stack,
-  FormControl,
   Button,
   IconButton,
+  Toolbar,
 } from "@mui/material";
-import { useEffect, useState, useContext } from "react";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
-import OrderLine from "../components/OrderLine";
 import AddIcon from "@mui/icons-material/Add";
-import NewOrderLine from "../components/NewOrderLine";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+
+import OrderLine from "../components/OrderLine";
+import NewOrderLine from "../components/NewOrderLine";
+
+const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function OrderDetailPage() {
   const [customerName, setCustomerName] = useState("");
@@ -31,45 +25,21 @@ function OrderDetailPage() {
   );
   const [status, setStatus] = useState("draft");
   const [orderLines, setOrderLines] = useState([]);
+  const [draftLine, setDraftLine] = useState(false);
+
   const navigate = useNavigate();
   const { orderId } = useParams();
-  const [draftLine, setDraftLine] = useState(false);
+
+  const fmtDate = (d) =>
+    d ? new Date(d).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" }) : "—";
 
   const handleDelete = async () => {
     const authToken = localStorage.getItem("authToken");
     try {
-      const res = await axios.delete(
-        `${VITE_SERVER_URL}/api/orders/${orderId}`,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
-      );
-      console.log(res);
+      await axios.delete(`${VITE_SERVER_URL}/api/orders/${orderId}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
       navigate(`/orders`);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    const authToken = localStorage.getItem("authToken");
-
-    const body = {
-      customerName,
-      deliveryDate,
-      status,
-    };
-
-    try {
-      const res = await axios.patch(
-        `${VITE_SERVER_URL}/api/orders/${orderId}`,
-        body,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
-      );
-      navigate(`/orders/${res.data._id}`);
     } catch (err) {
       console.log(err);
     }
@@ -78,148 +48,111 @@ function OrderDetailPage() {
   const getData = async () => {
     const authToken = localStorage.getItem("authToken");
     try {
-      const orderResponse = await axios.get(
+      const orderRes = await axios.get(
         `${VITE_SERVER_URL}/api/orders/${orderId}`,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
+        { headers: { Authorization: `Bearer ${authToken}` } }
       );
-      setCustomerName(orderResponse.data.customerName);
-      setDeliveryDate(new Date(orderResponse.data.deliveryDate));
-      setStatus(orderResponse.data.status);
+      setCustomerName(orderRes.data.customerName || "");
+      setDeliveryDate(orderRes.data.deliveryDate ? new Date(orderRes.data.deliveryDate) : null);
+      setStatus(orderRes.data.status || "draft");
 
-      const orderLineResponse = await axios.get(
+      const linesRes = await axios.get(
         `${VITE_SERVER_URL}/api/orderLines/order/${orderId}`,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
+        { headers: { Authorization: `Bearer ${authToken}` } }
       );
-      
-      setOrderLines(orderLineResponse.data);
+      setOrderLines(linesRes.data || []);
     } catch (error) {
       console.log(error);
     }
   };
 
+  // Load on mount, when orderId changes, and refresh after closing draft line
   useEffect(() => {
     getData();
-  }, [draftLine]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId, draftLine === false]); // refresh when draftLine flips back to false
 
   return (
     <Box sx={{ p: 2, pt: 0, pb: 2, maxWidth: 640 }}>
       <Toolbar />
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        Order: {orderId} {}
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        Order: {orderId}
       </Typography>
 
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <Box component="form" onSubmit={handleSave}>
-          <Stack spacing={2}>
-            <TextField
-              id="customer-name"
-              label="Customer Name"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              fullWidth
-              size="small"
-              required
-              disabled
-              sx={{ width: "50%" }}
-            />
+      <Box
+        component="dl"
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "140px 1fr", sm: "180px 1fr" },
+          columnGap: 2,
+          rowGap: 1,
+          "& dt, & dd": { m: 0 },
+          "& dt": { color: "text.secondary" },
+          textAlign: "left" 
+        }}
+      >
+        <Box component="dt">Customer</Box>
+        <Box component="dd">{customerName || "—"}</Box>
 
-            <DatePicker
-              label="Delivery Date"
-              value={deliveryDate}
-              onChange={(newValue) => setDeliveryDate(newValue)}
-              format="dd/MM/yyyy"
-              disabled
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  size: "small",
-                  required: true,
-                  sx: { width: "50%" },
-                },
-              }}
-            />
+        <Box component="dt">Delivery date</Box>
+        <Box component="dd">{fmtDate(deliveryDate)}</Box>
 
-            <FormControl
-              fullWidth
-              size="small"
-              required
-              disabled
-              sx={{ width: "50%" }}
-            >
-              <InputLabel id="order-status-label">Order Status</InputLabel>
-              <Select
-                labelId="order-status-label"
-                id="order-status"
-                label="Order Status"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                <MenuItem value="draft">Draft</MenuItem>
-                <MenuItem value="ready to pick">Ready to pick</MenuItem>
-                <MenuItem value="ready to ship">Ready to ship</MenuItem>
-                <MenuItem value="shipped">Shipped</MenuItem>
-              </Select>
-            </FormControl>
+        <Box component="dt">Status</Box>
+        <Box component="dd">{status || "—"}</Box>
+      </Box>
 
-            <Stack
-              direction="row"
-              justifyContent="flex-start"
-              spacing={1}
-              sx={{ mt: 1 }}
-            >
-              <Button
-                type="Edit"
-                variant="contained"
-                startIcon={<EditIcon />}
-                onClick={() => {
-                  navigate(`/orders/edit/${orderId}`);
-                }}
-              >
-                Edit
-              </Button>
-              <Button
-                type="delete"
-                variant="contained"
-                startIcon={<DeleteIcon />}
-                color="error"
-                onClick={handleDelete}
-              >
-                Delete
-              </Button>
-            </Stack>
-            {orderLines.map((line) => {
-              return (
-                <OrderLine
-                  key={line._id}
-                  resId={line._id}
-                  resInventoryId={line.inventory._id}
-                  resSku={line.inventory.sku}
-                  resTitle={line.inventory.title}
-                  resPriceEach={line.priceEach}
-                  resQuantity={line.quantity}
-                />
-              );
-            })}
-          </Stack>
-          {draftLine && (
-            <NewOrderLine orderLines={orderLines} setOrderLines={setOrderLines} setDraftLine={setDraftLine} />
-          )}
-          <IconButton
-            aria-label="addOrderLine"
-            disabled={draftLine}
-            onClick={() => {
-              setDraftLine(true);
-            }}
-            type="button"
-          >
-            <AddIcon />
-          </IconButton>
-        </Box>
-      </LocalizationProvider>
+      <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+        <Button
+          type="button"
+          variant="contained"
+          startIcon={<EditIcon />}
+          onClick={() => navigate(`/orders/edit/${orderId}`)}
+        >
+          Edit
+        </Button>
+        <Button
+          type="button"
+          variant="contained"
+          startIcon={<DeleteIcon />}
+          color="error"
+          onClick={handleDelete}
+        >
+          Delete
+        </Button>
+
+      </Stack>
+
+      <Stack spacing={1} sx={{ mt: 2 }}>
+        {orderLines.map((line) => (
+          <OrderLine
+            key={line._id}
+            resId={line._id}
+            resInventoryId={line.inventory?._id || line.inventory}
+            resSku={line.inventory?.sku}
+            resTitle={line.inventory?.title}
+            resPriceEach={line.priceEach}
+            resQuantity={line.quantity}
+          />
+        ))}
+      </Stack>
+
+      {draftLine && (
+        <NewOrderLine
+          orderLines={orderLines}
+          setOrderLines={setOrderLines}
+          setDraftLine={setDraftLine}
+        />
+      )}
+
+      <IconButton
+        aria-label="addOrderLine"
+        disabled={draftLine}
+        onClick={() => setDraftLine(true)}
+        type="button"
+        sx={{ mt: 1 }}
+      >
+        <AddIcon />
+      </IconButton>
     </Box>
   );
 }

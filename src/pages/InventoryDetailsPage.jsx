@@ -5,6 +5,7 @@ import { Box, Typography, Stack, Button,Toolbar } from "@mui/material";
 import ImageNotSupportedIcon from "@mui/icons-material/ImageNotSupported";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Toast from "../components/Toast";
 
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -36,6 +37,7 @@ function InventoryDetailsPage() {
   }, [inventoryId]);
 
   const handleDelete = async () => {
+    setError(false)
     const authToken = localStorage.getItem("authToken");
     try {
       await axios.delete(`${VITE_SERVER_URL}/api/inventory/${inventoryId}`, {
@@ -44,6 +46,7 @@ function InventoryDetailsPage() {
       navigate(`/inventory`);
     } catch (err) {
       console.log(err);
+      setError("There was an issue deleting inventory, try again later")
     }
   };
 
@@ -55,7 +58,6 @@ function InventoryDetailsPage() {
   const fmtDate = (d) => (d ? new Date(d).toLocaleString() : "—");
   const val = (v) => v ?? "—";
 
-  if (error) return <Box sx={{ p: 2, textAlign: "left" }}>{error}</Box>;
   if (!inv) return <Box sx={{ p: 2, textAlign: "left" }}>Loading…</Box>;
 
   return (
@@ -63,7 +65,7 @@ function InventoryDetailsPage() {
       <Toolbar />
 
       <Typography variant="h5" sx={{ mb: 2 }}>
-        Inventory Details
+        SKU: {val(inv.sku)}
       </Typography>
 
       {inv.imageUrl && !imgError ? (
@@ -104,7 +106,6 @@ function InventoryDetailsPage() {
           "& dt": { color: "text.secondary" },
         }}
       >
-        <Box component="dt">SKU</Box> <Box component="dd">{val(inv.sku)}</Box>
         <Box component="dt">Title</Box>{" "}
         <Box component="dd">{val(inv.title)}</Box>
         <Box component="dt">Description</Box>{" "}
@@ -146,9 +147,10 @@ function InventoryDetailsPage() {
         >
           Delete
         </Button>
+        {error &&<Toast message={error} variant={false}/>}
       </Stack>
     </Box>
   );
 }
 
-export default InventoryDetailsPage;
+module.exports = validateNoOpenOrderlines;

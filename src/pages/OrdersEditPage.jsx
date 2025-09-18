@@ -72,14 +72,13 @@ function OrdersEditPage() {
   };
 
   useEffect(() => {
-    console.log(orderId);
     getData();
   }, []);
 
   return (
     <Box sx={{ p: 2, pt: 0, maxWidth: 640 }}>
       <Toolbar />
-      <Typography variant="h4" sx={{ mb: 2 }}>
+      <Typography variant="h6" sx={{ mb: 2 }}>
         Order: {orderId} {}
       </Typography>
 
@@ -147,7 +146,6 @@ function OrdersEditPage() {
               >
                 Save
               </Button>
-              <Button onClick={getData}>Refresh</Button>
             </Stack>
           </Stack>
         </Box>

@@ -43,7 +43,7 @@ function NewOrdersPage() {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       console.log(res);
-      navigate(`/orders/edit/${res.data.response._id}`)
+      navigate(`/orders/${res.data.response._id}`)
     } catch (err) {
       console.log(err);
     }
@@ -52,7 +52,7 @@ function NewOrdersPage() {
   return (
     <Box sx={{ p: 2, pt: 0, maxWidth: 640 }}>
       <Toolbar />
-      <Typography variant="h4" sx={{ mb: 2 }}>
+      <Typography variant="h6" sx={{ mb: 2 }}>
         New Order
       </Typography>
 
