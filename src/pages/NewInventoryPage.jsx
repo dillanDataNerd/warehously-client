@@ -17,15 +17,14 @@ function NewInventoryPage() {
   const navigate = useNavigate();
   const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-  // Keep inputs as strings to avoid null warnings in TextField
   const [sku, setSKU] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [cost, setCost] = useState("");                 // was null
-  const [recommendedPrice, setRecommendedPrice] = useState(""); // was null
+  const [cost, setCost] = useState("");                 
+  const [recommendedPrice, setRecommendedPrice] = useState(""); 
   const [location, setLocation] = useState("");
-  const [stockedQty, setStockedQuantity] = useState(""); // was null
-  const [availableQty, setAvailableQty] = useState("");  // was null
+  const [stockedQty, setStockedQuantity] = useState(""); 
+  const [availableQty, setAvailableQty] = useState("");  
   const [imageUrl, setImageUrl] = useState("");
 
   const [openToast, setOpenToast] = useState(false);
@@ -67,7 +66,6 @@ function NewInventoryPage() {
     width: 1,
   });
 
-  // -------- Validation helpers --------
   const num = (v) => (v === "" ? NaN : Number(v));
   const titleError =
     submitted && !title.trim() ? "Title is required" : "";
@@ -104,7 +102,6 @@ function NewInventoryPage() {
     locationError,
   ].some(Boolean);
 
-  // -------- Submit --------
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
     setSubmitted(true);

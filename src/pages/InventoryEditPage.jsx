@@ -18,23 +18,21 @@ function InventoryEditPage() {
   const { inventoryId } = useParams();
   const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-  // Keep inputs as strings so TextFields remain controlled
   const [sku, setSKU] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [cost, setCost] = useState("");                 // string
-  const [recommendedPrice, setRecommendedPrice] = useState(""); // string
+  const [cost, setCost] = useState("");
+  const [recommendedPrice, setRecommendedPrice] = useState("");
   const [location, setLocation] = useState("");
-  const [stockedQty, setStockedQty] = useState("");     // string
-  const [availableQty, setAvailableQty] = useState(""); // string
+  const [stockedQty, setStockedQty] = useState("");
+  const [availableQty, setAvailableQty] = useState("");
   const [imageUrl, setImageUrl] = useState("");
 
   const [openToast, setOpenToast] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(true);
 
-  // Load existing item
   useEffect(() => {
     const getData = async () => {
       const authToken = localStorage.getItem("authToken");
@@ -64,7 +62,6 @@ function InventoryEditPage() {
     getData();
   }, [inventoryId, VITE_SERVER_URL]);
 
-  // Upload
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
     clipPath: "inset(50%)",
@@ -97,40 +94,61 @@ function InventoryEditPage() {
     }
   };
 
-  // ===== Validation (same pattern as New page) =====
+  // ===== Validation =====
   const num = (v) => (v === "" ? NaN : Number(v));
-  const getErrors = () => ({
-    title: !title.trim() ? "Title is required" : "",
-    sku: !sku.trim() ? "SKU is required" : "",
-    description: !description.trim() ? "Description is required" : "",
-    cost: cost === "" ? "Cost is required" : num(cost) < 0 ? "Cost must be ≥ 0" : "",
-    price:
-      recommendedPrice === ""
-        ? "Price is required"
-        : num(recommendedPrice) < 0
+  const titleError = submitted && !title.trim() ? "Title is required" : "";
+  const skuError = submitted && !sku.trim() ? "SKU is required" : "";
+  const descriptionError =
+    submitted && !description.trim() ? "Description is required" : "";
+  const costError =
+    submitted &&
+    (cost === ""
+      ? "Cost is required"
+      : num(cost) < 0
+        ? "Cost must be ≥ 0"
+        : "");
+  const priceError =
+    submitted &&
+    (recommendedPrice === ""
+      ? "Price is required"
+      : num(recommendedPrice) < 0
         ? "Price must be ≥ 0"
-        : "",
-    stocked:
-      stockedQty === "" ? "Stocked qty is required" : num(stockedQty) < 0 ? "Must be ≥ 0" : "",
-    available:
-      availableQty === ""
-        ? "Available qty is required"
-        : num(availableQty) < 0
+        : "");
+  const stockedError =
+    submitted &&
+    (stockedQty === ""
+      ? "Stocked qty is required"
+      : num(stockedQty) < 0
+        ? "Must be ≥ 0"
+        : "");
+  const availableError =
+    submitted &&
+    (availableQty === ""
+      ? "Available qty is required"
+      : num(availableQty) < 0
         ? "Must be ≥ 0"
         : !isNaN(num(stockedQty)) && num(availableQty) > num(stockedQty)
-        ? "Available cannot exceed stocked"
-        : "",
-    location: !location.trim() ? "Location is required" : "",
-  });
+          ? "Available cannot exceed stocked"
+          : "");
+  const locationError =
+    submitted && !location.trim() ? "Location is required" : "";
 
-  const errors = getErrors();
-  const hasErrors = Object.values(errors).some(Boolean);
+  const hasErrors = [
+    titleError,
+    skuError,
+    descriptionError,
+    costError,
+    priceError,
+    stockedError,
+    availableError,
+    locationError,
+  ].some(Boolean);
 
   // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);        // show messages
-    if (hasErrors) return;     // block submit if invalid
+    setSubmitted(true); // show messages
+    if (hasErrors) return; // block submit if invalid
 
     const authToken = localStorage.getItem("authToken");
     const body = {
@@ -159,7 +177,11 @@ function InventoryEditPage() {
 
   return (
     <>
-      <Box component="form" onSubmit={handleSubmit} sx={{ p: 2, pt: 0, maxWidth: 640 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ p: 2, pt: 0, maxWidth: 640 }}
+      >
         <Toolbar />
         <Typography variant="h4" sx={{ mb: 2 }}>
           Edit Inventory
@@ -173,8 +195,8 @@ function InventoryEditPage() {
             onChange={(e) => setTitle(e.target.value)}
             fullWidth
             size="medium"
-            error={submitted && Boolean(errors.title)}
-            helperText={submitted ? errors.title : ""}
+            error={Boolean(titleError)}
+            helperText={titleError}
           />
 
           <TextField
@@ -184,8 +206,8 @@ function InventoryEditPage() {
             onChange={(e) => setSKU(e.target.value)}
             fullWidth
             size="medium"
-            error={submitted && Boolean(errors.sku)}
-            helperText={submitted ? errors.sku : ""}
+            error={Boolean(skuError)}
+            helperText={skuError}
           />
 
           <TextField
@@ -197,8 +219,8 @@ function InventoryEditPage() {
             size="medium"
             multiline
             rows={3}
-            error={submitted && Boolean(errors.description)}
-            helperText={submitted ? errors.description : ""}
+            error={Boolean(descriptionError)}
+            helperText={descriptionError}
           />
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
@@ -211,8 +233,8 @@ function InventoryEditPage() {
               fullWidth
               size="medium"
               inputProps={{ min: 0, step: "any" }}
-              error={submitted && Boolean(errors.cost)}
-              helperText={submitted ? errors.cost : ""}
+              error={Boolean(costError)}
+              helperText={costError}
             />
             <TextField
               id="recommendedPrice"
@@ -223,8 +245,8 @@ function InventoryEditPage() {
               fullWidth
               size="medium"
               inputProps={{ min: 0, step: "any" }}
-              error={submitted && Boolean(errors.price)}
-              helperText={submitted ? errors.price : ""}
+              error={Boolean(priceError)}
+              helperText={priceError}
             />
           </Stack>
 
@@ -238,8 +260,8 @@ function InventoryEditPage() {
               fullWidth
               size="medium"
               inputProps={{ min: 0, step: 1 }}
-              error={submitted && Boolean(errors.stocked)}
-              helperText={submitted ? errors.stocked : ""}
+              error={Boolean(stockedError)}
+              helperText={stockedError}
             />
             <TextField
               id="availableQuantity"
@@ -250,8 +272,8 @@ function InventoryEditPage() {
               fullWidth
               size="medium"
               inputProps={{ min: 0, step: 1 }}
-              error={submitted && Boolean(errors.available)}
-              helperText={submitted ? errors.available : ""}
+              error={Boolean(availableError)}
+              helperText={availableError}
             />
           </Stack>
 
@@ -262,8 +284,8 @@ function InventoryEditPage() {
             onChange={(e) => setLocation(e.target.value)}
             fullWidth
             size="medium"
-            error={submitted && Boolean(errors.location)}
-            helperText={submitted ? errors.location : ""}
+            error={Boolean(locationError)}
+            helperText={locationError}
           />
 
           <Button
