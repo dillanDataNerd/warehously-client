@@ -3,6 +3,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
+import Toast from "./Toast";
 
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -21,6 +22,8 @@ function OrderLine({
   const [priceEach, setPriceEach] = useState(0);
   const [quantity, setQuantity] = useState(0);
   const [inventory, setInventory] = useState("");
+  const [error, setError] = useState(null);
+
 
   useEffect(() => {
     setInventory(`${resSku} — ${resTitle}`);
@@ -42,6 +45,7 @@ function OrderLine({
       setOrderLines((prev) => prev.filter((line) => line._id !== resId));
     } catch (err) {
       console.log(err);
+      setError("Failed to Delete item. Try again later")
     }
   };
 
@@ -82,6 +86,7 @@ function OrderLine({
   };
 
   return (
+    <>
     <Stack
       direction={{ xs: "column", md: "row" }}
       spacing={2}
@@ -164,6 +169,8 @@ function OrderLine({
         )}
       </Stack>
     </Stack>
+    {error &&<Toast message={error} variant={false}/>}
+    </>
   );
 }
 

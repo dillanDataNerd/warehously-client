@@ -15,7 +15,7 @@ function ErrorPage() {
               This page doesn’t exist.
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              An error occurred or the page was moved/removed. Please check the URL or head back home.
+              An error occurred or this page doesn't exist. Please check the URL or head back home.
             </Typography>
 
             <Stack

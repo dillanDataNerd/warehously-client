@@ -14,7 +14,6 @@ function LoginPage() {
   const navigate = useNavigate();
   const { authenticateUser }=useContext(AuthContext)
 
-
   const providers = [{ id: "credentials", name: "Email and Password" }];
   const signIn = async (provider, formData) => {
     try {
@@ -39,7 +38,6 @@ function LoginPage() {
   };
 
   return (
-    // preview-start
     <AppProvider theme={theme}>
       <SignInPage
         signIn={signIn}
@@ -50,7 +48,6 @@ function LoginPage() {
         }}
       />
     </AppProvider>
-    // preview-end
   );
 }
 

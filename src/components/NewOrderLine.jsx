@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
 import { useParams } from "react-router-dom";
+import Toast from "./Toast";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
@@ -14,6 +15,7 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
   const [inventory, setInventory] = useState("");
   const [inventoryOptions, setInventoryOptions] = useState([]);
   const { orderId } = useParams();
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const getInventoryOptions = async () => {
@@ -29,7 +31,6 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
           }))
         );
       } catch (error) {
-        console.log(error);
       }
     };
     getInventoryOptions();
@@ -59,15 +60,17 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
       
     } catch (err) {
       console.log(err);
+      setError("Failed to create orderline. Check that you have enough inventory for this order.")
     }
   };
 
   return (
+    <>
     <Stack
-      direction={{ xs: "column", md: "row" }}
-      spacing={2}
-      alignItems="center"
-      sx={{ mb: 2 }}
+    direction={{ xs: "column", md: "row" }}
+    spacing={2}
+    alignItems="center"
+    sx={{ mb: 2 }}
     >
       <Box sx={{ flex: "1 1 32%" }}>
         <Autocomplete
@@ -90,7 +93,7 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
               },
             },
           }}
-        />
+          />
       </Box>
 
       <Box sx={{ flex: "0 1 16%" }}>
@@ -102,7 +105,7 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
           onChange={(e) => setQuantity(Number(e.target.value))}
           inputProps={{ min: 0, step: 1, inputMode: "numeric" }}
           fullWidth
-        />
+          />
       </Box>
 
       <Box sx={{ flex: "0 1 16%" }}>
@@ -114,7 +117,7 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
           onChange={(e) => setPriceEach(Number(e.target.value))}
           inputProps={{ min: 0, inputMode: "decimal" }}
           fullWidth
-        />
+          />
       </Box>
 
       <IconButton aria-label="cancel" onClick={handleCancel} type="button">
@@ -124,6 +127,8 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
         <SendIcon />
       </IconButton>
     </Stack>
+    {error &&<Toast message={error} variant={false}/>}
+    </>
   );
 }
 

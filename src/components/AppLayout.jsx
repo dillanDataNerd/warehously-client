@@ -72,12 +72,12 @@ function AppLayout() {
 
             <Divider sx={{ my: 1 }} />
 
-            <ListItemButton component={NavLink} to="/users">
+            {/* <ListItemButton component={NavLink} to="/users">
               <ListItemIcon>
                 <PeopleIcon />
               </ListItemIcon>
               <ListItemText primary="Users" />
-            </ListItemButton>
+            </ListItemButton> */}
           </List>
         </Box>
 
@@ -103,3 +103,8 @@ function AppLayout() {
 }
 
 export default AppLayout;
+//  const [error, setError] = useState(null);
+//         setError("Failed to load inventory.");
+
+//{error &&<Toast message={error} variant={false}/>}
+

@@ -17,31 +17,27 @@ function NewInventoryPage() {
   const navigate = useNavigate();
   const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
+  // Keep inputs as strings to avoid null warnings in TextField
   const [sku, setSKU] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [cost, setCost] = useState(null);
-  const [recommendedPrice, setRecommendedPrice] = useState(null);
+  const [cost, setCost] = useState("");                 // was null
+  const [recommendedPrice, setRecommendedPrice] = useState(""); // was null
   const [location, setLocation] = useState("");
-  const [stockedQty, setStockedQuantity] = useState(null);
-  const [availableQty, setAvailableQty] = useState(null);
+  const [stockedQty, setStockedQuantity] = useState(""); // was null
+  const [availableQty, setAvailableQty] = useState("");  // was null
   const [imageUrl, setImageUrl] = useState("");
+
   const [openToast, setOpenToast] = useState(false);
-  
+  const [error, setError] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
 
   const [isUploading, setIsUploading] = useState(false);
   const handleFileUpload = async (event) => {
-    console.log("The file to be uploaded is: ", event.target.files[0]);
-
-    if (!event.target.files[0]) {
-      return;
-    }
-
+    if (!event.target.files[0]) return;
     setIsUploading(true);
-
     const uploadData = new FormData();
     uploadData.append("image", event.target.files[0]);
-    console.log("The file to be uploaded is: ", event.target.files[0]);
 
     try {
       const response = await axios.post(
@@ -50,9 +46,12 @@ function NewInventoryPage() {
       );
       setImageUrl(response.data.imageUrl);
       setIsUploading(false);
-      setOpenToast(true)
-    } catch (error) {
-      console.log("There was an error uploading the file");
+      setOpenToast(true);
+    } catch {
+      setIsUploading(false);
+      setError(
+        "Failed to upload item. Ensure it is an image and below 10mb."
+      );
     }
   };
 
@@ -68,136 +67,180 @@ function NewInventoryPage() {
     width: 1,
   });
 
-  const handleSubmit = async () => {
+  // -------- Validation helpers --------
+  const num = (v) => (v === "" ? NaN : Number(v));
+  const titleError =
+    submitted && !title.trim() ? "Title is required" : "";
+  const skuError =
+    submitted && !sku.trim() ? "SKU is required" : "";
+  const descriptionError =
+    submitted && !description.trim() ? "Description is required" : "";
+  const costError =
+    submitted && (cost === "" ? "Cost is required" : num(cost) < 0 ? "Cost must be ≥ 0" : "");
+  const priceError =
+    submitted && (recommendedPrice === "" ? "Price is required" : num(recommendedPrice) < 0 ? "Price must be ≥ 0" : "");
+  const stockedError =
+    submitted && (stockedQty === "" ? "Stocked qty is required" : num(stockedQty) < 0 ? "Must be ≥ 0" : "");
+  const availableError =
+    submitted &&
+    (availableQty === ""
+      ? "Available qty is required"
+      : num(availableQty) < 0
+      ? "Must be ≥ 0"
+      : !isNaN(num(stockedQty)) && num(availableQty) > num(stockedQty)
+      ? "Available cannot exceed stocked"
+      : "");
+  const locationError =
+    submitted && !location.trim() ? "Location is required" : "";
+
+  const hasErrors = [
+    titleError,
+    skuError,
+    descriptionError,
+    costError,
+    priceError,
+    stockedError,
+    availableError,
+    locationError,
+  ].some(Boolean);
+
+  // -------- Submit --------
+  const handleSubmit = async (e) => {
+    e?.preventDefault?.();
+    setSubmitted(true);
+    if (hasErrors) return;
+
     const authToken = localStorage.getItem("authToken");
     const body = {
-      sku,
-      title,
-      description,
-      cost,
-      recommendedPrice,
-      location,
-      stockedQty,
-      availableQty,
+      sku: sku.trim(),
+      title: title.trim(),
+      description: description.trim(),
+      cost: Number(cost),
+      recommendedPrice: Number(recommendedPrice),
+      location: location.trim(),
+      stockedQty: Number(stockedQty),
+      availableQty: Number(availableQty),
       imageUrl,
     };
+
     try {
-      const res = await axios.post(
-        `${VITE_SERVER_URL}/api/inventory/new`,
-        body,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
-      );
-      console.log(res);
-    } catch (error) {
-      console.log(error);
+      await axios.post(`${VITE_SERVER_URL}/api/inventory/new`, body, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      navigate("/inventory");
+    } catch (err) {
+      setError(err);
     }
   };
 
   return (
-    <>
-      <Box sx={{ p: 2, pt: 0, maxWidth: 640 }}>
-        <Toolbar />
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          New Inventory
-        </Typography>
-        <Stack spacing={2}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ p: 2, pt: 0, maxWidth: 640 }}>
+      <Toolbar />
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        New Inventory
+      </Typography>
+
+      <Stack spacing={2}>
+        <TextField
+          id="title"
+          label="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          fullWidth
+          size="medium"
+          error={Boolean(titleError)}
+          helperText={titleError}
+        />
+
+        <TextField
+          id="sku"
+          label="SKU"
+          value={sku}
+          onChange={(e) => setSKU(e.target.value)}
+          fullWidth
+          size="medium"
+          error={Boolean(skuError)}
+          helperText={skuError}
+        />
+
+        <TextField
+          id="description"
+          label="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          fullWidth
+          size="medium"
+          multiline
+          rows={3}
+          error={Boolean(descriptionError)}
+          helperText={descriptionError}
+        />
+
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <TextField
-            id="title"
-            label="Title"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-            }}
+            id="cost"
+            type="number"
+            label="Cost"
+            value={cost}
+            onChange={(e) => setCost(e.target.value)}
             fullWidth
             size="medium"
-            required
+            error={Boolean(costError)}
+            helperText={costError}
+            inputProps={{ min: 0, step: "any" }}
           />
           <TextField
-            id="sku"
-            label="SKU"
-            value={sku}
-            onChange={(e) => {
-              setSKU(e.target.value);
-            }}
+            id="recommendedPrice"
+            label="Price"
+            type="number"
+            value={recommendedPrice}
+            onChange={(e) => setRecommendedPrice(e.target.value)}
             fullWidth
             size="medium"
-            required
-          />
-          <TextField
-            id="description"
-            label="Description"
-            value={description}
-            onChange={(e) => {
-              setDescription(e.target.value);
-            }}
-            fullWidth
-            size="medium"
-            multiline
-            rows={3}
-            required
-          />
-          <Stack direction={"row"} spacing={2}>
-            <TextField
-              id="cost"
-              label="Cost"
-              value={cost}
-              onChange={(e) => {
-                setCost(e.target.value);
-              }}
-              fullWidth
-              size="medium"
-              required
-            />
-            <TextField
-              id="recommendedPrice"
-              label="Price"
-              value={recommendedPrice}
-              onChange={(e) => {
-                setRecommendedPrice(e.target.value);
-              }}
-              fullWidth
-              size="medium"
-              required
-            />
-          </Stack>
-          <Stack direction={"row"} spacing={2}>
-            <TextField
-              id="stockedQuantity"
-              label="Stocked Qty"
-              value={stockedQty}
-              onChange={(e) => {
-                setStockedQuantity(e.target.value);
-              }}
-              fullWidth
-              size="medium"
-              required
-            />
-            <TextField
-              id="availableQuantity"
-              label="available Qty"
-              value={availableQty}
-              onChange={(e) => {
-                setAvailableQty(e.target.value);
-              }}
-              fullWidth
-              size="medium"
-              required
-            />
-          </Stack>
-          <TextField
-            id="location"
-            label="Location"
-            value={location}
-            onChange={(e) => {
-              setLocation(e.target.value);
-            }}
-            fullWidth
-            size="medium"
-            required
+            error={Boolean(priceError)}
+            helperText={priceError}
+            inputProps={{ min: 0, step: "any" }}
           />
         </Stack>
+
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+          <TextField
+            id="stockedQuantity"
+            type="number"
+            label="Stocked Qty"
+            value={stockedQty}
+            onChange={(e) => setStockedQuantity(e.target.value)}
+            fullWidth
+            size="medium"
+            error={Boolean(stockedError)}
+            helperText={stockedError}
+            inputProps={{ min: 0, step: 1 }}
+          />
+          <TextField
+            id="availableQuantity"
+            label="Available Qty"
+            type="number"
+            value={availableQty}
+            onChange={(e) => setAvailableQty(e.target.value)}
+            fullWidth
+            size="medium"
+            error={Boolean(availableError)}
+            helperText={availableError}
+            inputProps={{ min: 0, step: 1 }}
+          />
+        </Stack>
+
+        <TextField
+          id="location"
+          label="Location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          fullWidth
+          size="medium"
+          error={Boolean(locationError)}
+          helperText={locationError}
+        />
+
         <Button
           component="label"
           role={undefined}
@@ -210,32 +253,33 @@ function NewInventoryPage() {
           Upload photo
           <VisuallyHiddenInput type="file" onChange={handleFileUpload} />
         </Button>
-        <Stack
-          direction="row"
-          justifyContent="flex-end"
-          spacing={1}
-          sx={{ mt: 1 }}
+      </Stack>
+
+      <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mt: 2 }}>
+        <Button
+          type="button"
+          variant="outlined"
+          onClick={() => navigate("/inventory")}
         >
-          <Button
-            type="cancel"
-            variant="outlined"
-            onClick={() => {
-              navigate("/inventory");
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            onClick={() => handleSubmit()}
-          >
-            Create Inventory
-          </Button>
-        </Stack>
-        {openToast && <Toast message={"Image successfully uploaded"} success={true} />}
-      </Box>
-    </>
+          Cancel
+        </Button>
+        <Button type="submit" variant="contained">
+          Create Inventory
+        </Button>
+      </Stack>
+
+      {openToast && (
+        <Toast message={"Image successfully uploaded"} success={true} />
+      )}
+
+      {error && (
+        <Toast
+          message={"Inventory not created. SKU already exists in database"}
+          success={false}
+        />
+      )}
+    </Box>
   );
 }
+
 export default NewInventoryPage;
