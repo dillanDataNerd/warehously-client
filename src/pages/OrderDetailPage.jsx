@@ -27,6 +27,7 @@ function OrderDetailPage() {
   const [status, setStatus] = useState("draft");
   const [orderLines, setOrderLines] = useState([]);
   const [draftLine, setDraftLine] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
 
   const navigate = useNavigate();
   const { orderId } = useParams();
@@ -70,7 +71,6 @@ function OrderDetailPage() {
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
       setOrderLines(linesRes.data || []);
-      setDraftLine(linesRes.data.length === 0);
     } catch (error) {
       console.log(error);
     }
@@ -79,7 +79,11 @@ function OrderDetailPage() {
   // Load on mount, when orderId changes, and refresh after closing draft line
   useEffect(() => {
     getData();
-  }, [orderId ,draftLine]); // refresh when draftLine flips back to false
+    if (firstLoad){
+      setFirstLoad(false)
+      setDraftLine(orderLines.length === 0)
+    }
+  }, [orderId,draftLine]);
 
   return (
     <Box sx={{ p: 2, pt: 0, pb: 2, maxWidth: 640 }}>
@@ -145,19 +149,18 @@ function OrderDetailPage() {
             resTitle={line.inventory?.title}
             resPriceEach={line.priceEach}
             resQuantity={line.quantity}
+            setOrderLines={setOrderLines}
           />
         ))}
 
-      {draftLine && (
-        <NewOrderLine
-          orderLines={orderLines}
-          setOrderLines={setOrderLines}
-          setDraftLine={setDraftLine}
-        />
-      )}
-      
+        {draftLine && (
+          <NewOrderLine
+            orderLines={orderLines}
+            setOrderLines={setOrderLines}
+            setDraftLine={setDraftLine}
+          />
+        )}
       </Stack>
-
 
       <IconButton
         aria-label="addOrderLine"

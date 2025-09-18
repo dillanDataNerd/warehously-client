@@ -9,12 +9,11 @@ import { useParams } from "react-router-dom";
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
-  const [priceEach, setPriceEach] = useState(null);
-  const [quantity, setQuantity] = useState(null);
-  const [inventory, setInventory] = useState(null); 
+  const [priceEach, setPriceEach] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [inventory, setInventory] = useState("");
   const [inventoryOptions, setInventoryOptions] = useState([]);
   const { orderId } = useParams();
-
 
   useEffect(() => {
     const getInventoryOptions = async () => {
@@ -41,25 +40,35 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
   const handleSave = async () => {
     const authToken = localStorage.getItem("authToken");
     const body = {
-      priceEach: Number(priceEach), 
+      priceEach: Number(priceEach),
       quantity: Number(quantity),
-      inventory: inventory.id, 
-      order: orderId
+      inventory: inventory.id,
+      order: orderId,
     };
     try {
-      const res = await axios.post(`${VITE_SERVER_URL}/api/orderLines/new`, body, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
+      const res = await axios.post(
+        `${VITE_SERVER_URL}/api/orderLines/new`,
+        body,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
       console.log(res);
       setDraftLine(false);
-      setOrderLines([orderLines.push(body)])
+      setOrderLines([orderLines.push(body)]);
+      
     } catch (err) {
       console.log(err);
     }
   };
 
   return (
-    <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+    <Stack
+      direction={{ xs: "column", md: "row" }}
+      spacing={2}
+      alignItems="center"
+      sx={{ mb: 2 }}
+    >
       <Box sx={{ flex: "1 1 32%" }}>
         <Autocomplete
           value={inventory}
@@ -70,13 +79,13 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
           renderInput={(params) => (
             <TextField {...params} label="Inventory" size="small" />
           )}
-          sx={{ width: 300 }} 
+          sx={{ width: 300 }}
           slotProps={{
             paper: {
               sx: {
                 "& .MuiAutocomplete-option": {
                   textAlign: "left",
-                  justifyContent: "flex-start", 
+                  justifyContent: "flex-start",
                 },
               },
             },
