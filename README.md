@@ -57,7 +57,6 @@ Provides user interface for authentication, inventory management, order creation
 - ProtectedRoute / Route guards (`IsPrivate`, `IsAnon`)  
 - Forms (InventoryForm, OrderForm, OrderLineForm)  
 - Tables (Inventory, Order)  
-- Modals or Confirmation dialogs (delete confirmations)  
 - Loading spinners / Toast notifications / Error banners  
 
 ## Services
@@ -89,8 +88,6 @@ Provides user interface for authentication, inventory management, order creation
 ## Context
 
 - `AuthContext` – handles current user, token, login state, logout  
-- Possibly `InventoryContext` – to share inventory state and refresh lists  
-- Possibly `OrdersContext` – similarly for orders  
 
 ### Collaborators
 
