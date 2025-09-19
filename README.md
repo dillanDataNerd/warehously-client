@@ -87,7 +87,12 @@ Provides user interface for authentication, inventory management, order creation
 
 ## Context
 
-- `AuthContext` – handles current user, token, login state, logout  
+- `AuthContext` – handles current user, token, login state, logout
+
+## Client feature backlog
+- Make an admin only section where they can update user roles
+- Create a restocking tables shipment so we can cleany add back inventory
+- Make a log of orderlines associated to inventory in the inventory details page similar to the list of orderlines associated to an order
 
 ### Collaborators
 
