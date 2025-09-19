@@ -56,7 +56,7 @@ Provides user interface for authentication, inventory management, order creation
 - Footer  
 - ProtectedRoute / Route guards (`IsPrivate`, `IsAnon`)  
 - Forms (InventoryForm, OrderForm, OrderLineForm)  
-- Lists / Cards (InventoryCard, OrderCard)  
+- Tables (Inventory, Order)  
 - Modals or Confirmation dialogs (delete confirmations)  
 - Loading spinners / Toast notifications / Error banners  
 
