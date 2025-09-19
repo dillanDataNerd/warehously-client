@@ -1,5 +1,3 @@
-// layout/AppLayout.jsx
-import * as React from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import {
   Box,
@@ -16,18 +14,17 @@ import {
 } from "@mui/material";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import PeopleIcon from "@mui/icons-material/People";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 const drawerWidth = 180;
 
+// This component wraps the entire webapp. It is the nav bar on the left and title bar on the top of the page
 function AppLayout() {
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <CssBaseline />
 
-      {/* Top bar (optional) */}
+      {/* Top header bar*/}
       <AppBar position="fixed" sx={{ zIndex: (t) => t.zIndex.drawer + 1 }}>
         <Toolbar>
           <Typography variant="h6" noWrap>
@@ -36,7 +33,7 @@ function AppLayout() {
         </Toolbar>
       </AppBar>
 
-      {/* Left sidebar */}
+      {/* Left nav bar */}
       <Drawer
         variant="permanent"
         sx={{
@@ -45,7 +42,7 @@ function AppLayout() {
           "& .MuiDrawer-paper": { width: drawerWidth, boxSizing: "border-box" },
         }}
       >
-        {/* pushes content below AppBar height */}
+        {/* The toolbar pushes actual content below AppBar height */}
         <Toolbar />
         <Box sx={{ overflow: "auto", p: 2 }}>
           <List>
@@ -63,30 +60,14 @@ function AppLayout() {
               <ListItemText primary="Inventory" />
             </ListItemButton>
 
-            {/* <ListItemButton component={NavLink} to="/picking-runs">
-              <ListItemIcon>
-                <LocalShippingIcon />
-              </ListItemIcon>
-              <ListItemText primary="Picking" />
-            </ListItemButton> */}
-
             <Divider sx={{ my: 1 }} />
-
-            {/* <ListItemButton component={NavLink} to="/users">
-              <ListItemIcon>
-                <PeopleIcon />
-              </ListItemIcon>
-              <ListItemText primary="Users" />
-            </ListItemButton> */}
           </List>
         </Box>
 
         <Box sx={{ mt: "auto", p: 2 }}>
           <Divider sx={{ my: 1 }} />
           <ListItemButton
-            onClick={() => {
-              localStorage.removeItem("authToken");
-            }}
+            onClick={() => {localStorage.removeItem("authToken");}}
             component={NavLink}
             to="/home"
           >
@@ -103,8 +84,3 @@ function AppLayout() {
 }
 
 export default AppLayout;
-//  const [error, setError] = useState(null);
-//         setError("Failed to load inventory.");
-
-//{error &&<Toast message={error} variant={false}/>}
-

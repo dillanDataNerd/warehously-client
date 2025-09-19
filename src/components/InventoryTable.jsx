@@ -1,4 +1,3 @@
-import * as React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -9,17 +8,7 @@ import Paper from "@mui/material/Paper";
 import { NavLink } from "react-router-dom";
 
 
-
 function InventoryTable({ rows }) {
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = date.toLocaleString("en-US", { month: "short" }); // Jan, Feb, Mar ...
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-}
-
 
   return (
     <TableContainer component={Paper}>

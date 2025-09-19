@@ -1,7 +1,3 @@
-// use then context
-// get rid of event listner
-
-
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 

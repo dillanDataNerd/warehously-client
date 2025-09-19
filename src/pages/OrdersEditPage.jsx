@@ -20,6 +20,7 @@ const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
 
+// This is the same as the new order page but the states are pre-set and the save sends a patch request to the server
 function OrdersEditPage() {
   const [customerName, setCustomerName] = useState("");
   const [deliveryDate, setDeliveryDate] = useState(

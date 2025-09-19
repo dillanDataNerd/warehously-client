@@ -18,7 +18,7 @@ function OrderLine({
   resInventoryId,
   setOrderLines,
 }) {
-  const [viewOnly, setViewOnly] = useState(true);
+  const [viewOnly, setViewOnly] = useState(true);  
   const [priceEach, setPriceEach] = useState(0);
   const [quantity, setQuantity] = useState(0);
   const [inventory, setInventory] = useState("");
@@ -40,12 +40,11 @@ function OrderLine({
           headers: { Authorization: `Bearer ${authToken}` },
         }
       );
-      // remove the deleted orderLine from the list of all orderlines. Prev calls the current state 
-
+      // remove the deleted orderLine from the list of all orderlines and set this for the orderlines state.  
       setOrderLines((prev) => prev.filter((line) => line._id !== resId));
     } catch (err) {
       console.log(err);
-      setError("Failed to Delete item. Try again later")
+      setError("Failed to delete item. Reach out to support to help resolve this issue")
     }
   };
 

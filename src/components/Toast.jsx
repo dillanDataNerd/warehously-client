@@ -4,6 +4,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { useEffect } from 'react';
 
+// Primarily used for serverside error handling. It takes the input message and success state asprops making it useful for successful and unsuccessful calls
 export default function Toast({message, success}) {
   const [open, setOpen] = React.useState(false);
 
@@ -34,11 +35,5 @@ export default function Toast({message, success}) {
     </div>
   );
 }
-
-
-
-//   const [error, setError] = useState(null);
-//      setError("Failed to Delete item. Try again later")
-//      {error && <Toast message={"Image successfully uploaded"} success={false} />}
 
 

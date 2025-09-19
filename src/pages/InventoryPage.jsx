@@ -5,13 +5,8 @@ import {
   Stack,
   TextField,
   Button,
-  CircularProgress,
-  Typography,
   Toolbar,
-  InputLabel,
-  Select,
 } from "@mui/material";
-import PageHeader from "../components/PageHeader";
 import InventoryTable from "../components/InventoryTable";
 import { useContext } from "react";
 import { AuthContext } from "../context/auth.context";

@@ -79,11 +79,11 @@ function OrderDetailPage() {
   // Load on mount, when orderId changes, and refresh after closing draft line
   useEffect(() => {
     getData();
-    if (firstLoad){
-      setFirstLoad(false)
-      setDraftLine(orderLines.length === 0)
+    if (firstLoad) {
+      setFirstLoad(false);
+      setDraftLine(orderLines.length === 0);
     }
-  }, [orderId,draftLine]);
+  }, [orderId, draftLine]);
 
   return (
     <Box sx={{ p: 2, pt: 0, pb: 2, maxWidth: 640 }}>
@@ -139,6 +139,7 @@ function OrderDetailPage() {
         Order Lines
       </Typography>
 
+      {/* Iterate through all of the orderlines and put the details as props  into the orderlines component */}
       <Stack spacing={1} sx={{ mt: 2 }}>
         {orderLines.map((line) => (
           <OrderLine
@@ -152,7 +153,8 @@ function OrderDetailPage() {
             setOrderLines={setOrderLines}
           />
         ))}
-
+        {/* when the user has selected to create a new orderline, it opens the neworderline componenet. When the order has no orders
+this is open automatically */}
         {draftLine && (
           <NewOrderLine
             orderLines={orderLines}

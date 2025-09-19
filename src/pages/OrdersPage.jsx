@@ -9,7 +9,6 @@ import {
   Typography,
   Toolbar,
 } from "@mui/material";
-import PageHeader from "../components/PageHeader";
 import OrderTable from "../components/OrderTable";
 import { useContext } from "react";
 import { AuthContext } from "../context/auth.context";
@@ -31,12 +30,13 @@ function OrdersPage() {
       });
       setAllOrders(res.data);
       setFilteredOrders(res.data)
-      console.log(allOrders)
     } catch (err) {
       console.log(err);
     }
   };
 
+  // clean the the search field input and use it to filter the customerName and id properties of an order.
+  // this is then passed to the order table componenet to be rendered
   const filterOrders= () => {
     const query = searchString.trim().toLowerCase()
 

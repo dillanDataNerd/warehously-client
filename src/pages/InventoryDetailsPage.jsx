@@ -50,6 +50,7 @@ function InventoryDetailsPage() {
     }
   };
 
+  //format inputs so it looks consistent on the table
   const fmtMoney = (n) =>
     typeof n === "number"
       ? n.toLocaleString(undefined, { style: "currency", currency: "EUR" })

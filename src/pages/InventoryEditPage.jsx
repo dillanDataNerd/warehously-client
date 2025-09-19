@@ -1,3 +1,4 @@
+// ===== Imports =====
 import {
   TextField,
   Box,
@@ -13,11 +14,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import Toast from "../components/Toast";
 
+// ===== Component =====
 function InventoryEditPage() {
+  // Router hooks
   const navigate = useNavigate();
-  const { inventoryId } = useParams();
-  const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
+  const { inventoryId } = useParams(); // Get inventoryId from URL params
+  const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL; // Server URL from env
 
+  // ===== State for form fields =====
   const [sku, setSKU] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -28,11 +32,13 @@ function InventoryEditPage() {
   const [availableQty, setAvailableQty] = useState("");
   const [imageUrl, setImageUrl] = useState("");
 
-  const [openToast, setOpenToast] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState(null);
-  const [submitted, setSubmitted] = useState(true);
+  // ===== State for UI feedback =====
+  const [openToast, setOpenToast] = useState(false); // Success toast for upload
+  const [isUploading, setIsUploading] = useState(false); // Disable upload while uploading
+  const [error, setError] = useState(null); // Error messages
+  const [submitted, setSubmitted] = useState(true); // Track if form submitted
 
+  // ===== Load existing inventory data on mount =====
   useEffect(() => {
     const getData = async () => {
       const authToken = localStorage.getItem("authToken");
@@ -42,6 +48,7 @@ function InventoryEditPage() {
           { headers: { Authorization: `Bearer ${authToken}` } }
         );
         const d = res.data || {};
+        // Initialize form fields with fetched values
         setSKU(d.sku ?? "");
         setTitle(d.title ?? "");
         setDescription(d.description ?? "");
@@ -62,6 +69,7 @@ function InventoryEditPage() {
     getData();
   }, [inventoryId, VITE_SERVER_URL]);
 
+  // ===== Hidden file input for image upload =====
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
     clipPath: "inset(50%)",
@@ -74,6 +82,7 @@ function InventoryEditPage() {
     width: 1,
   });
 
+  // ===== Handle file upload =====
   const handleFileUpload = async (event) => {
     if (!event.target.files?.[0]) return;
     setIsUploading(true);
@@ -85,17 +94,17 @@ function InventoryEditPage() {
         `${VITE_SERVER_URL}/api/upload`,
         uploadData
       );
-      setImageUrl(response.data.imageUrl);
+      setImageUrl(response.data.imageUrl); // Save image URL in state
       setIsUploading(false);
-      setOpenToast(true);
+      setOpenToast(true); // Show success toast
     } catch {
       setIsUploading(false);
       setError("Failed to upload image. Check it is an image and < 10 MB.");
     }
   };
 
-  // ===== Validation =====
-  const num = (v) => (v === "" ? NaN : Number(v));
+  // ===== Validation helpers =====
+  const num = (v) => (v === "" ? NaN : Number(v)); // Convert string to number or NaN
   const titleError = submitted && !title.trim() ? "Title is required" : "";
   const skuError = submitted && !sku.trim() ? "SKU is required" : "";
   const descriptionError =
@@ -133,6 +142,7 @@ function InventoryEditPage() {
   const locationError =
     submitted && !location.trim() ? "Location is required" : "";
 
+  // Whether form has any validation errors
   const hasErrors = [
     titleError,
     skuError,
@@ -144,11 +154,11 @@ function InventoryEditPage() {
     locationError,
   ].some(Boolean);
 
-  // Submit
+  // ===== Submit handler =====
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true); // show messages
-    if (hasErrors) return; // block submit if invalid
+    setSubmitted(true); // Trigger validation messages
+    if (hasErrors) return; // Block submit if errors
 
     const authToken = localStorage.getItem("authToken");
     const body = {
@@ -169,12 +179,13 @@ function InventoryEditPage() {
         body,
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
-      navigate(`/inventory/${inventoryId}`);
+      navigate(`/inventory/${inventoryId}`); // Redirect on success
     } catch {
       setError("Update failed. Check your inputs or try again.");
     }
   };
 
+  // ===== Render =====
   return (
     <>
       <Box
@@ -182,12 +193,15 @@ function InventoryEditPage() {
         onSubmit={handleSubmit}
         sx={{ p: 2, pt: 0, maxWidth: 640 }}
       >
+        {/* Page title */}
         <Toolbar />
         <Typography variant="h4" sx={{ mb: 2 }}>
           Edit Inventory
         </Typography>
 
+        {/* Form fields */}
         <Stack spacing={2}>
+          {/* Title */}
           <TextField
             id="title"
             label="Title"
@@ -199,6 +213,7 @@ function InventoryEditPage() {
             helperText={titleError}
           />
 
+          {/* SKU */}
           <TextField
             id="sku"
             label="SKU"
@@ -210,6 +225,7 @@ function InventoryEditPage() {
             helperText={skuError}
           />
 
+          {/* Description */}
           <TextField
             id="description"
             label="Description"
@@ -223,6 +239,7 @@ function InventoryEditPage() {
             helperText={descriptionError}
           />
 
+          {/* Cost & Price */}
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <TextField
               id="cost"
@@ -250,6 +267,7 @@ function InventoryEditPage() {
             />
           </Stack>
 
+          {/* Stocked & Available qty */}
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <TextField
               id="stockedQuantity"
@@ -277,6 +295,7 @@ function InventoryEditPage() {
             />
           </Stack>
 
+          {/* Location */}
           <TextField
             id="location"
             label="Location"
@@ -288,6 +307,7 @@ function InventoryEditPage() {
             helperText={locationError}
           />
 
+          {/* Upload image button */}
           <Button
             component="label"
             role={undefined}
@@ -302,6 +322,7 @@ function InventoryEditPage() {
           </Button>
         </Stack>
 
+        {/* Action buttons */}
         <Stack
           direction="row"
           justifyContent="flex-end"
@@ -320,11 +341,13 @@ function InventoryEditPage() {
           </Button>
         </Stack>
 
+        {/* Success toast for image upload */}
         {openToast && (
           <Toast message={"Image successfully uploaded"} success={true} />
         )}
       </Box>
 
+      {/* Error toast for failures */}
       {error && <Toast message={error} success={false} />}
     </>
   );

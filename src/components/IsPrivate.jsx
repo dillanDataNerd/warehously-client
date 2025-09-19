@@ -2,6 +2,8 @@ import { useContext } from "react";
 import { AuthContext } from "../context/auth.context";
 import { Navigate } from "react-router-dom";
  
+// wraps over all private routes within the app. The user will be authenticated when they access the page and if the
+// token is not valid, be rerouted to the login page
 function IsPrivate( { children } ) {
   
   const { isLoggedIn, isLoading } = useContext(AuthContext);

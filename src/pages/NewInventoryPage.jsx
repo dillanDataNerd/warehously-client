@@ -1,3 +1,4 @@
+// ===== Imports =====
 import {
   TextField,
   Box,
@@ -13,10 +14,12 @@ import { useNavigate } from "react-router-dom";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import Toast from "../components/Toast";
 
+// ===== Component =====
 function NewInventoryPage() {
   const navigate = useNavigate();
-  const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
+  const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL; // API server URL
 
+  // ===== Form state =====
   const [sku, setSKU] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -27,13 +30,15 @@ function NewInventoryPage() {
   const [availableQty, setAvailableQty] = useState("");  
   const [imageUrl, setImageUrl] = useState("");
 
-  const [openToast, setOpenToast] = useState(false);
-  const [error, setError] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
+  // ===== UI state =====
+  const [openToast, setOpenToast] = useState(false); // show success toast after upload
+  const [error, setError] = useState(null); // error messages
+  const [submitted, setSubmitted] = useState(false); // track form submission
+  const [isUploading, setIsUploading] = useState(false); // file upload in progress
 
-  const [isUploading, setIsUploading] = useState(false);
+  // ===== File upload handler =====
   const handleFileUpload = async (event) => {
-    if (!event.target.files[0]) return;
+    if (!event.target.files[0]) return; // no file selected
     setIsUploading(true);
     const uploadData = new FormData();
     uploadData.append("image", event.target.files[0]);
@@ -43,17 +48,16 @@ function NewInventoryPage() {
         `${VITE_SERVER_URL}/api/upload`,
         uploadData
       );
-      setImageUrl(response.data.imageUrl);
+      setImageUrl(response.data.imageUrl); // set uploaded image URL
       setIsUploading(false);
-      setOpenToast(true);
+      setOpenToast(true); // show success toast
     } catch {
       setIsUploading(false);
-      setError(
-        "Failed to upload item. Ensure it is an image and below 10mb."
-      );
+      setError("Failed to upload item. Ensure it is an image and below 10mb.");
     }
   };
 
+  // ===== Hidden input for file uploads =====
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
     clipPath: "inset(50%)",
@@ -66,13 +70,11 @@ function NewInventoryPage() {
     width: 1,
   });
 
-  const num = (v) => (v === "" ? NaN : Number(v));
-  const titleError =
-    submitted && !title.trim() ? "Title is required" : "";
-  const skuError =
-    submitted && !sku.trim() ? "SKU is required" : "";
-  const descriptionError =
-    submitted && !description.trim() ? "Description is required" : "";
+  // ===== Validation =====
+  const num = (v) => (v === "" ? NaN : Number(v)); // parse string → number
+  const titleError = submitted && !title.trim() ? "Title is required" : "";
+  const skuError = submitted && !sku.trim() ? "SKU is required" : "";
+  const descriptionError = submitted && !description.trim() ? "Description is required" : "";
   const costError =
     submitted && (cost === "" ? "Cost is required" : num(cost) < 0 ? "Cost must be ≥ 0" : "");
   const priceError =
@@ -88,9 +90,9 @@ function NewInventoryPage() {
       : !isNaN(num(stockedQty)) && num(availableQty) > num(stockedQty)
       ? "Available cannot exceed stocked"
       : "");
-  const locationError =
-    submitted && !location.trim() ? "Location is required" : "";
+  const locationError = submitted && !location.trim() ? "Location is required" : "";
 
+  // check if any error exists
   const hasErrors = [
     titleError,
     skuError,
@@ -102,10 +104,11 @@ function NewInventoryPage() {
     locationError,
   ].some(Boolean);
 
+  // ===== Form submit handler =====
   const handleSubmit = async (e) => {
-    e?.preventDefault?.();
-    setSubmitted(true);
-    if (hasErrors) return;
+    e?.preventDefault?.(); // prevent page reload
+    setSubmitted(true); // mark as submitted → show validation
+    if (hasErrors) return; // stop if invalid
 
     const authToken = localStorage.getItem("authToken");
     const body = {
@@ -124,12 +127,13 @@ function NewInventoryPage() {
       await axios.post(`${VITE_SERVER_URL}/api/inventory/new`, body, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      navigate("/inventory");
+      navigate("/inventory"); // redirect to inventory list
     } catch (err) {
-      setError(err);
+      setError(err); // set error state
     }
   };
 
+  // ===== Render UI =====
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ p: 2, pt: 0, maxWidth: 640 }}>
       <Toolbar />
@@ -137,7 +141,9 @@ function NewInventoryPage() {
         New Inventory
       </Typography>
 
+      {/* Form fields */}
       <Stack spacing={2}>
+        {/* Title */}
         <TextField
           id="title"
           label="Title"
@@ -149,6 +155,7 @@ function NewInventoryPage() {
           helperText={titleError}
         />
 
+        {/* SKU */}
         <TextField
           id="sku"
           label="SKU"
@@ -160,6 +167,7 @@ function NewInventoryPage() {
           helperText={skuError}
         />
 
+        {/* Description */}
         <TextField
           id="description"
           label="Description"
@@ -173,6 +181,7 @@ function NewInventoryPage() {
           helperText={descriptionError}
         />
 
+        {/* Cost + Price */}
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <TextField
             id="cost"
@@ -200,6 +209,7 @@ function NewInventoryPage() {
           />
         </Stack>
 
+        {/* Stocked + Available Qty */}
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
           <TextField
             id="stockedQuantity"
@@ -227,6 +237,7 @@ function NewInventoryPage() {
           />
         </Stack>
 
+        {/* Location */}
         <TextField
           id="location"
           label="Location"
@@ -238,6 +249,7 @@ function NewInventoryPage() {
           helperText={locationError}
         />
 
+        {/* Upload button */}
         <Button
           component="label"
           role={undefined}
@@ -252,6 +264,7 @@ function NewInventoryPage() {
         </Button>
       </Stack>
 
+      {/* Action buttons */}
       <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mt: 2 }}>
         <Button
           type="button"
@@ -265,6 +278,7 @@ function NewInventoryPage() {
         </Button>
       </Stack>
 
+      {/* Toast notifications */}
       {openToast && (
         <Toast message={"Image successfully uploaded"} success={true} />
       )}

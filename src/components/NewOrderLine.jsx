@@ -17,26 +17,29 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
   const { orderId } = useParams();
   const [error, setError] = useState(null)
 
+  // get all inventory items and format them to be SKU-Title. This will be used in the select box
+  const getInventoryOptions = async () => {
+    const authToken = localStorage.getItem("authToken");
+    try {
+      const { data } = await axios.get(`${VITE_SERVER_URL}/api/inventory`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setInventoryOptions(
+        data.map((item) => ({
+          id: item._id,
+          label: `${item.sku} - ${item.title}`,
+        }))
+      );
+    } catch (error) {
+    }
+  };
+
   useEffect(() => {
-    const getInventoryOptions = async () => {
-      const authToken = localStorage.getItem("authToken");
-      try {
-        const { data } = await axios.get(`${VITE_SERVER_URL}/api/inventory`, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-        setInventoryOptions(
-          data.map((item) => ({
-            id: item._id,
-            label: `${item.sku} - ${item.title}`,
-          }))
-        );
-      } catch (error) {
-      }
-    };
     getInventoryOptions();
   }, []);
 
   const handleCancel = () => setDraftLine(false);
+
 
   const handleSave = async () => {
     const authToken = localStorage.getItem("authToken");
@@ -72,6 +75,7 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
     alignItems="center"
     sx={{ mb: 2 }}
     >
+      {/* Order line inputs from the user */}
       <Box sx={{ flex: "1 1 32%" }}>
         <Autocomplete
           value={inventory}
@@ -99,7 +103,7 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
       <Box sx={{ flex: "0 1 16%" }}>
         <TextField
           size="small"
-          label="Quantity"
+          label="quantity"
           type="number"
           value={quantity}
           onChange={(e) => setQuantity(Number(e.target.value))}
@@ -111,7 +115,7 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
       <Box sx={{ flex: "0 1 16%" }}>
         <TextField
           size="small"
-          label="Price"
+          label="price"
           type="number"
           value={priceEach}
           onChange={(e) => setPriceEach(Number(e.target.value))}
@@ -119,7 +123,7 @@ function NewOrderLine({ orderLines, setOrderLines, setDraftLine }) {
           fullWidth
           />
       </Box>
-
+{/* action buttons to save or discard the draft order line */}
       <IconButton aria-label="cancel" onClick={handleCancel} type="button">
         <CloseIcon />
       </IconButton>
