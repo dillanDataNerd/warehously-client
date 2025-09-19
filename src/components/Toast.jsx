@@ -37,3 +37,8 @@ export default function Toast({message, success}) {
 
 
 
+//   const [error, setError] = useState(null);
+//      setError("Failed to Delete item. Try again later")
+//      {error && <Toast message={"Image successfully uploaded"} success={false} />}
+
+

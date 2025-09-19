@@ -72,16 +72,14 @@ export default function SignIn() {
   return (
     <>
       <Box
-        direction="column"
-        justifyContent="space-between"
         sx={{
           display: "flex",
           justifyContent: "center",
-          maxWidth: 400,
-
           alignItems: "center",
           minHeight: "100vh",
           px: 2,
+          width: "100%",
+          mx: "auto",
         }}
       >
         <Card
@@ -90,14 +88,16 @@ export default function SignIn() {
             width: "100%",
             p: 4,
             boxShadow: 3,
+            maxWidth: 400,
           }}
         >
           <Typography
             component="h1"
             variant="h4"
-            sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
+            fullWidth
+            textAlign={"center"}
           >
-            Sign up to warehously
+            Sign up
           </Typography>
           <Box
             component="form"
@@ -177,6 +177,18 @@ export default function SignIn() {
             >
               Sign up
             </Button>
+            <Button
+              type="button"
+              fullWidth
+              variant="outlined"
+              color="secondary"
+              onClick={() => {
+                navigate("/home");
+              }}
+            >
+              Go to login
+            </Button>
+
             {showToast && (
               <Toast
                 message={"You have successfully created a user"}

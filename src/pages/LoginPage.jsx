@@ -5,14 +5,15 @@ import { SignInPage } from "@toolpad/core/SignInPage";
 import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/auth.context";  
+import { AuthContext } from "../context/auth.context";
+import { Button,Box } from "@mui/material";
 
 const VITE_SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function LoginPage() {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { authenticateUser }=useContext(AuthContext)
+  const { authenticateUser } = useContext(AuthContext);
 
   const providers = [{ id: "credentials", name: "Email and Password" }];
   const signIn = async (provider, formData) => {
@@ -25,8 +26,8 @@ function LoginPage() {
       );
 
       console.log("Login success:", response);
-      localStorage.setItem("authToken", response.data.authToken)
-      authenticateUser()
+      localStorage.setItem("authToken", response.data.authToken);
+      authenticateUser();
       navigate("/orders");
       return;
     } catch (error) {
@@ -38,17 +39,33 @@ function LoginPage() {
   };
 
   return (
-    <AppProvider theme={theme}>
-      <SignInPage
-        signIn={signIn}
-        providers={providers}
-        slotProps={{
-          emailField: { autoFocus: false },
-          form: { noValidate: true },
-        }}
-      />
-    </AppProvider>
-  );
+  <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", p: 2 }}>
+    <Box sx={{ width: "100%", maxWidth: 420 }}>
+      <AppProvider theme={theme}>
+        <SignInPage
+          signIn={signIn}
+          providers={providers}
+          slotProps={{
+            emailField: { autoFocus: false },
+            form: { noValidate: true },
+          }}
+          sx={{ minHeight: "auto" }}
+        />
+      </AppProvider>
+
+      <Button
+        fullWidth
+        sx={{ mt: 2 }}
+        variant="outlined"
+        color="inherit"  
+        size="large"
+        onClick={() => navigate("/signup")}
+      >
+        Create an account here
+      </Button>
+    </Box>
+  </Box>
+);
 }
 
 export default LoginPage;
