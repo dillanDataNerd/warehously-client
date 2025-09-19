@@ -4,7 +4,6 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import OrdersPage from "./pages/OrdersPage";
 import InventoryPage from "./pages/InventoryPage";
-import PickingRunPage from "./pages/PickingRunPage";
 import ErrorPage from "./pages/ErrorPage";
 import IsPrivate from "./components/IsPrivate";
 import AppLayout from "./components/AppLayout"; 
@@ -28,7 +27,6 @@ function App() {
       <Route element={<IsPrivate><AppLayout /></IsPrivate>}>
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/inventory" element={<InventoryPage />} />
-        <Route path="/picking-runs" element={<PickingRunPage />} />
         <Route path="/orders/new" element={<NewOrdersPage />} />
         <Route path="/orders/edit/:orderId" element={<OrdersEditPage />} />
         <Route path="/orders/:orderId" element={<OrderDetailPage/>}/>
